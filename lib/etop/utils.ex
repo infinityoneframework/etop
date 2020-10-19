@@ -48,4 +48,10 @@ defmodule Etop.Utils do
   def local_time(precision, _) when is_atom(precision) do
     local_time(NaiveDateTime.utc_now(), precision)
   end
+
+  def pad(string, len) when is_binary(string), do: String.pad_leading(string, len, " ")
+  def pad(item, len), do: item |> to_string() |> pad(len)
+
+  def pad_t(string, len) when is_binary(string), do: String.pad_trailing(string, len, " ")
+  def pad_t(item, len), do: item |> to_string() |> pad_t(len)
 end
