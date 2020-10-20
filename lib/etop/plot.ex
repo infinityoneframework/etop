@@ -63,8 +63,6 @@ defmodule Etop.Plot do
 
     title_width = if len < width, do: len, else: width
 
-    IO.inspect({title_width, len, width}, label: "title_width, len, width")
-
     leftover = for _ <- 1..scaler_x, do: 0
 
     scaled_items =

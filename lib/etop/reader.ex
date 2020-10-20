@@ -51,7 +51,7 @@ defmodule Etop.Reader do
     list =
       current
       |> sort()
-      |> Enum.take(state.length)
+      |> Enum.take(state.nprocs)
 
     Logger.debug(fn -> "handle_collect done" end)
     # IEx.pry()

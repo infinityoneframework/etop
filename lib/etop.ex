@@ -9,19 +9,24 @@ defmodule Etop do
   require Logger
 
   @name __MODULE__
+  @valid_opts ~w(freq length debug file os_pid cores format interval npocs)a
 
   ###############
   # Public API
 
+  def load do
+    GenServer.call(@name, :load)
+  end
+
   def pause do
-    GenServer.cast(@name, :pause)
+    GenServer.call(@name, :pause)
   end
 
   @doc """
   Set Etop settings
   """
   def set_opts(opts) do
-    if Enum.all?(Keyword.keys(opts), &(&1 in ~w(freq length debug file os_pid cores format)a)) do
+    if valid_opts?(opts) do
       GenServer.cast(@name, {:set_opts, opts})
     else
       {:error, :invalid_opts}
@@ -33,7 +38,7 @@ defmodule Etop do
   """
   def start(opts \\ []) do
     if Process.whereis(@name) do
-      GenServer.cast(@name, :start)
+      GenServer.call(@name, {:start, opts})
     else
       GenServer.start(__MODULE__, opts, name: @name)
     end
@@ -77,15 +82,6 @@ defmodule Etop do
         1
       end
 
-    path = opts[:file]
-
-    format =
-      cond do
-        val = opts[:format] -> val
-        path && Path.extname(path) == ".exs" -> :exs
-        true -> :text
-      end
-
     util = if cpu_util?, do: CpuUtil.pid_util(os_pid), else: nil
 
     if node = opts[:node] do
@@ -98,26 +94,29 @@ defmodule Etop do
     # util2 = CpuUtil.pid_util(os_pid)
     # {%{state | load: CpuUtil.calc_pid_util(util1, util2, cores)}, util2}
     {:ok,
-     %{
-       prev: nil,
-       freq: opts[:freq] || 5000,
-       length: opts[:length] || 10,
-       debug: opts[:debug] || false,
-       file: path,
-       os_pid: os_pid,
-       cores: cores,
-       util: util,
-       load: nil,
-       format: format,
-       halted: Keyword.get(opts, :halted, false),
-       timer_ref: nil,
-       cpu_util?: cpu_util?,
-       node: opts[:node],
-       info_map: nil,
-       list: nil,
-       stats: nil,
-       total: 0
-     }}
+     set_file(
+       %{
+         cpu_util?: cpu_util?,
+         cores: cores,
+         debug: opts[:debug] || false,
+         file: nil,
+         format: nil,
+         halted: Keyword.get(opts, :halted, false),
+         info_map: nil,
+         interval: opts[:interval] || opts[:freq] || 5000,
+         list: nil,
+         load: nil,
+         node: opts[:node],
+         nprocs: opts[:nprocs] || opts[:length] || 10,
+         os_pid: os_pid,
+         prev: nil,
+         stats: nil,
+         timer_ref: nil,
+         total: 0,
+         util: util
+       },
+       opts
+     )}
   end
 
   # def cpu_util(fun, args, true), do: apply(CpuUtil, fun, args)
@@ -132,12 +131,22 @@ defmodule Etop do
     reply(state, state)
   end
 
-  def handle_call(:start, _, %{halted: true} = state) do
-    reply(start_timer(%{state | halted: false}, 1000), :ok)
+  def handle_call({:start, opts}, _, %{halted: true} = state) do
+    %{set_opts(state, opts) | halted: false}
+    |> start_timer(1000)
+    |> reply(:ok)
   end
 
-  def handle_call(:start, _, state) do
+  def handle_call({:start, _}, _, state) do
     reply(state, :not_halted)
+  end
+
+  def handle_call(:load, _, state) do
+    if state.format == :exs and is_binary(state.file) do
+      reply(state, Report.load(state.file))
+    else
+      reply(state, {:error, :invalid_file})
+    end
   end
 
   def handle_call(:pause, _, %{halted: true} = state) do
@@ -150,7 +159,10 @@ defmodule Etop do
 
   def handle_cast({:set_opts, opts}, state) do
     state = Enum.reduce(opts, state, fn {k, v}, state -> Map.put(state, k, v) end)
-    noreply(state)
+
+    state
+    |> set_opts(opts)
+    |> noreply()
   end
 
   def handle_cast(:stop, state) do
@@ -179,13 +191,6 @@ defmodule Etop do
     Reader.remote_stats(state)
     noreply(state |> start_timer())
   end
-
-  # def handle_info({:info_response, info_map}, state) do
-  #   Logger.debug(fn -> "handle_info :info_response" end)
-  #   # We have all the data collected now. Time to report it.
-  #   Report.handle_report(state, info_map)
-  #   noreply(state)
-  # end
 
   def handle_info(:stop, state) do
     {:stop, :normal, state}
@@ -225,7 +230,40 @@ defmodule Etop do
       else: false
   end
 
-  defp start_timer(%{freq: interval} = state) do
+  defp get_file_format(opts) do
+    path = opts[:file]
+
+    cond do
+      val = opts[:format] -> val
+      path && Path.extname(path) == ".exs" -> :exs
+      true -> :text
+    end
+  end
+
+  defp maybe_set_file(state, opts) do
+    if Keyword.has_key?(opts, :file) do
+      set_file(state, opts)
+    else
+      state
+    end
+  end
+
+  defp set_file(state, opts) do
+    %{state | file: opts[:file], format: get_file_format(opts)}
+  end
+
+  defp set_opts(state, opts) do
+    if valid_opts?(opts) do
+      opts
+      |> Enum.reduce(state, fn {k, v}, state -> Map.put(state, k, v) end)
+      |> maybe_set_file(opts)
+    else
+      Logger.info("Invalid opts")
+      state
+    end
+  end
+
+  defp start_timer(%{interval: interval} = state) do
     start_timer(state, interval)
   end
 
@@ -238,4 +276,10 @@ defmodule Etop do
 
   defp noreply(%{} = state), do: {:noreply, state}
   defp noreply(state), do: raise("invalid state: #{inspect(state)}")
+
+  defp valid_opts?(opts) do
+    opts
+    |> Keyword.keys()
+    |> Enum.all?(&(&1 in @valid_opts))
+  end
 end
