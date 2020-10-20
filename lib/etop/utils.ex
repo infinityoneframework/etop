@@ -54,4 +54,14 @@ defmodule Etop.Utils do
 
   def pad_t(string, len) when is_binary(string), do: String.pad_trailing(string, len, " ")
   def pad_t(item, len), do: item |> to_string() |> pad_t(len)
+
+  def center(item, len) when is_binary(item) do
+    str_len = String.length(item)
+
+    len1 = if str_len < len, do: div(len - str_len, 2) + str_len, else: 0
+
+    item |> pad(len1) |> pad_t(len)
+  end
+
+  def center(item, len), do: item |> to_string() |> center(len)
 end

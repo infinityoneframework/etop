@@ -265,18 +265,28 @@ defmodule Etop.Report do
   def list_memory(entries, field \\ :total), do: list(entries, :memory, field)
 
   def plot_cpu(entries, opts \\ []) do
+    labels = list(entries, [:summary, :time])
+    IO.inspect(labels, pretty: true)
+
     entries
     |> list_cpu()
-    |> plot(Keyword.merge([label_prefix: "%"], opts))
+    |> plot(Keyword.merge([label_prefix: "%", title: "CPU Utilization", labels: labels], opts))
   end
 
   def plot_memory(entries, opts \\ []) do
     field = opts[:field] || :total
 
+    labels = list(entries, [:summary, :time])
+
     entries
     |> list(:memory, field)
     |> Enum.map(&(&1 / (1024 * 1024)))
-    |> plot(Keyword.merge([width: 20, height: 100, label_prefix: "MB"], opts))
+    |> plot(
+      Keyword.merge(
+        [width: 80, height: 50, label_prefix: "MB", title: "Memory Usage", labels: labels],
+        opts
+      )
+    )
   end
 
   def plot(list, opts \\ []), do: Plot.plot(list, opts)
