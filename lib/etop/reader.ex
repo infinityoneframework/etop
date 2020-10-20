@@ -181,8 +181,6 @@ defmodule Etop.Reader do
   ###############
   # Private
 
-  defp add_last({topic, map, acc}), do: Map.put(acc, topic, map)
-
   defp calc_reductions(curr, prev) do
     prev = if prev, do: prev, else: %{}
 

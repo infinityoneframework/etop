@@ -28,7 +28,7 @@ defmodule Etop.Report do
   """
   import Etop.Utils, only: [pad: 2, pad_t: 2]
 
-  alias Etop.{Utils, Plot}
+  alias Etop.{Utils, Chart}
 
   require Logger
   require IEx
@@ -288,7 +288,7 @@ defmodule Etop.Report do
     )
   end
 
-  def plot(list, opts \\ []), do: Plot.plot(list, opts)
+  def plot(list, opts \\ []), do: Chart.puts(list, opts)
 
   def create_report(list, total, stats) do
     stats
