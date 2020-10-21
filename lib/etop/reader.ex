@@ -14,7 +14,6 @@ defmodule Etop.Reader do
     :status
   ]
 
-  require IEx
   require Logger
 
   @doc """
@@ -25,7 +24,6 @@ defmodule Etop.Reader do
   def handle_collect(state, stats) do
     Logger.debug(fn -> "handle_collect start" end)
 
-    # IO.inspect(stats, label: "handle_collect")
     util2 =
       case stats[:util2] do
         {:ok, contents} ->
@@ -44,8 +42,6 @@ defmodule Etop.Reader do
 
     stats = %{stats | procs: parse_system_info(stats.procs), load: load, util2: util2}
 
-    # Logger.debug(fn -> "stats.procs length: #{length(stats.procs)}" end)
-
     {current, total} = calc_reductions(stats.procs, state.prev)
 
     list =
@@ -54,128 +50,77 @@ defmodule Etop.Reader do
       |> Enum.take(state.nprocs)
 
     Logger.debug(fn -> "handle_collect done" end)
-    # IEx.pry()
     %{state | prev: stats.procs, util: util2, total: total, stats: stats, list: list}
   end
 
-  # def parse_system_info(info) when is_binary(info) do
-  #   Logger.debug(fn ->
-  #     len = Float.round(String.length(info) / 1000 / 1000, 2)
-  #     "info length #{len}"
-  #   end)
+  @doc """
+  Fetch the top stats from either a current node or a remote node.
 
-  #   info
-  #   |> String.split("\n", trim: true)
-  #   |> Enum.reduce({nil, nil, %{}}, fn
-  #     "=" <> name, {nil, nil, acc} ->
-  #       {name, %{}, acc}
+  Gets the following information and sends `{:result, info_map}` to the calling process:
 
-  #     "=" <> name, {topic, map, acc} ->
-  #       acc = Map.put(acc, topic, map)
-  #       {name, %{}, acc}
+      %{
+        procs: List of Process.info(pid) with memory stats added,
+        nprocs: total process count,
+        memory: overall memory information,
+        runq: length of the run queue,
+        util2: contents of "/proc/<os-pid>/stat",
+      }
 
-  #     item, {topic, map, acc} ->
-  #       map =
-  #         case String.split(item, ":", parts: 2) do
-  #           [name, value] ->
-  #             Map.put(map, name, value)
+  NOTE: remote nodes are not working.
+  """
+  def remote_stats(%{node: node, os_pid: os_pid}) when not is_nil(node) do
+    # TODO: This isn't working. It works if I call this directly from iex>,
+    # but raises an error its called from the GenServer.
+    # Also note that the code below is duplicate code. Once It works, it should
+    # be refactored to use the same as the local version.
 
-  #           [one] ->
-  #             Map.put(map, one, nil)
-  #         end
-
-  #       {topic, map, acc}
-  #   end)
-  #   |> add_last()
-  # end
-
-  def parse_system_info(info) do
-    info
-    |> Enum.map(fn {pid, item} ->
-      {pid,
-       item
-       |> info_map_memory()
-       |> Map.take(@info_fields)}
-    end)
-    |> Enum.into(%{})
-  end
-
-  defp info_map_memory(%{} = item) do
-    case item.memory do
-      {:memory, memory} -> %{item | memory: memory}
-      memory when is_integer(memory) -> %{item | memory: memory}
-      _ -> %{item | memory: 0}
-    end
-  end
-
-  defp info_map_memory(item) when is_list(item) do
-    item
-    |> Enum.into(%{})
-    |> info_map_memory()
-  end
-
-  # def remote_info(%{node: node}, pid_list) when not is_nil(node) do
-  #   # IO.inspect(node, label: "remote_info")
-  #   pid = self()
-
-  #   Node.spawn_link(node, fn ->
-  #     response =
-  #       pid_list
-  #       |> Enum.map(&{&1, Process.info(&1)})
-  #       |> Enum.into(%{})
-
-  #     send(pid, {:info_response, response})
-  #   end)
-  # end
-
-  # def remote_info(_, pid_list) do
-  #   response =
-  #     pid_list
-  #     |> Enum.map(&{&1, Process.info(&1)})
-  #     |> Enum.into(%{})
-
-  #   send(self(), {:info_response, response})
-  # end
-
-  def remote_stats(%{node: node}) when not is_nil(node) do
     # IO.inspect(node, label: "remote_stats")
     pid = self()
 
-    # fun = fn ->
-    #   result = %{
-    #     # procs: :erlang.system_info(:procs),
-    #     test: :hello,
-    #     # nprocs: :process_count |> :erlang.system_info() |> to_string(),
-    #     # memory: Enum.into(:erlang.memory(), %{}),
-    #     # runq: :erlang.statistics(:run_queue),
-    #     # util2: nil,
-    #     # load: nil
-    #   }
-    #   # }
-    #   # |> IO.inspect(label: "payload")
-    #   # send(pid, {:result, result})
-    # end
-
-    # IO.inspect fun, label: "the fun"
     Node.spawn_link(node, fn ->
-      send(pid, {:result, :test})
+      send(
+        pid,
+        {:result,
+         %{
+           procs:
+             Process.list()
+             |> Enum.map(
+               &{&1, Keyword.put(Process.info(&1), :memory, :erlang.process_info(&1, :memory))}
+             ),
+           nprocs: :process_count |> :erlang.system_info() |> to_string(),
+           memory: Enum.into(:erlang.memory(), %{}),
+           runq: :erlang.statistics(:run_queue),
+           util2: File.read("/proc/#{os_pid}/stat"),
+           load: nil
+         }}
+      )
     end)
 
-    IO.puts("ran remote_stats")
+    # IO.puts("ran remote_stats")
   end
 
   def remote_stats(state) do
-    # IO.inspect(nil, label: "remote_stats")
-    # util2 = if state.cpu_util?, do: CpuUtil.pid_util(state.os_pid), else: nil
+    # Get the stats from the local node
     send(self(), {:result, get_stats(state.os_pid)})
   end
 
-  def system_info, do: system_info(:info)
+  @doc """
+  Configurable sort.
 
-  def system_info(which) do
-    which
-    |> :erlang.system_info()
-    |> parse_system_info()
+  ## Arguments
+
+  * `list` - the enumerable to be sorted.
+  * `field` (:reductions_diff) - the field to be sorted on.
+  * `field_fn` (fn field -> &elem(&1, 1)[field] end) - function to get the field.
+  * `sorter_fn` (&>/2) -> Sort comparator (default descending)
+  """
+  def sort(
+        list,
+        field \\ :reductions_diff,
+        field_fn \\ fn field -> &elem(&1, 1)[field] end,
+        sorter_fn \\ &>/2
+      ) do
+    Enum.sort_by(list, field_fn.(field), sorter_fn)
   end
 
   ###############
@@ -195,25 +140,8 @@ defmodule Etop.Reader do
     end)
   end
 
-  # defp collect_info(list, state) do
-  #   # IO.puts("collect_info")
-
-  #   {pid_list, list} =
-  #     list
-  #     |> Enum.map(fn {pid_str, reds} ->
-  #       pid_str = String.replace(pid_str, "proc:", "")
-  #       pid = pid_str |> String.to_charlist() |> :erlang.list_to_pid()
-  #       {pid, {pid_str, reds}}
-  #     end)
-  #     |> Enum.unzip()
-
-  #   remote_info(state, pid_list)
-  #   list
-  # end
-
   def get_stats(pid),
     do: %{
-      # procs: :erlang.system_info(:procs),
       procs:
         Process.list()
         |> Enum.map(
@@ -226,32 +154,28 @@ defmodule Etop.Reader do
       load: nil
     }
 
-  # defp reductions_to_int(raw) do
-  #   Enum.reduce(raw, %{}, fn {pid, settings}, acc ->
-  #     settings =
-  #       settings
-  #       |> Keyword.take(
-  #         ~w(memory message_queue_len registered_name current_function initial_call reductions)a
-  #       )
-  #       # ["Reductions", "Spawned as", "Memory", "State", "Message queue length"])
-  #       |> Enum.into(%{})
+  defp info_map_memory(%{} = item) do
+    case item.memory do
+      {:memory, memory} -> %{item | memory: memory}
+      memory when is_integer(memory) -> %{item | memory: memory}
+      _ -> %{item | memory: 0}
+    end
+  end
 
-  #     Map.put(acc, pid, settings)
-  #     # with reds when is_binary(reds) <- settings["Reductions"],
-  #     #      {num, _} <- reds |> String.trim() |> Integer.parse() do
-  #     #   Map.put(acc, pid, Map.put(settings, "Reductions", num))
-  #     # else
-  #     #   _ -> acc
-  #     # end
-  #   end)
-  # end
+  defp info_map_memory(item) when is_list(item) do
+    item
+    |> Enum.into(%{})
+    |> info_map_memory()
+  end
 
-  defp sort(
-         curr,
-         field \\ :reductions_diff,
-         field_fn \\ fn field -> &elem(&1, 1)[field] end,
-         sorter_fn \\ &>/2
-       ) do
-    Enum.sort_by(curr, field_fn.(field), sorter_fn)
+  defp parse_system_info(info) do
+    info
+    |> Enum.map(fn {pid, item} ->
+      {pid,
+       item
+       |> info_map_memory()
+       |> Map.take(@info_fields)}
+    end)
+    |> Enum.into(%{})
   end
 end

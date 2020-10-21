@@ -59,8 +59,8 @@ defmodule Etop.ChartTest do
     assert String.length(String.trim_trailing(title)) - div(String.length("Test Chart"), 2) == 40
   end
 
-  defp data(lower, len),
-    do: Enum.slice(data(), lower, len)
+  # defp data(lower, len),
+  #   do: Enum.slice(data(), lower, len)
 
   defp data,
     do: [

@@ -1,10 +1,40 @@
 defmodule Etop.Chart do
   @moduledoc """
-  Text plots.
+  Create a ascii charts.
+
+  ## Examples
+
+      iex> data = for i <- 1..30, do: i * 2 + :rand.uniform(4) - 2
+      iex> labels = for {_, i} <- Enum.with_index(data), do: "Label \#{i}"
+      iex> Etop.Chart.puts(data, labels: labels, title: "Test Plot")
+
+                                    Test Plot
+                                    ---------
+      64 |                                                           *
+      60 |                                                         *
+      56 |                                                     * *
+      52 |                                               * * *
+      48 |                                             *
+      44 |                                         * *
+      40 |                                       *
+      36 |                               * * * *
+      32 |                             *
+      28 |                         * *
+      24 |                     * *
+      20 |                 * *
+      16 |             * *
+      12 |       *   *
+       8 |   * *   *
+       4 | *
+       0 |
+         +-------------------+-------------------+-------------------+--
+                          Label 10            Label 20
   """
   import Etop.Utils, only: [pad: 2, pad_t: 2, center: 2], warn: false
 
-  @empty_char 32
+  @space 32
+  @nl 10
+  @empty_char @space
   @plot_char ?*
 
   @doc """
@@ -40,54 +70,29 @@ defmodule Etop.Chart do
   def generate(items, opts \\ []) do
     conf = get_config(items, opts)
 
-    scaled_items = scale_items(items, conf)
-
     if Application.get_env(:etop, :trace) do
       IO.inspect(conf, label: "config")
     end
 
-    grid = create_grid(scaled_items, conf.plot_char)
-
-    leader = for _ <- 1..(String.length(conf.y_label_postfix) + 5), do: 32
-
-    x_axis = create_x_axis(conf.x_range)
-
-    add_leader = fn list -> list ++ leader ++ x_axis end
-
+    scaled_items = scale_items(items, conf)
     x_count = div(Enum.count(conf.x_range) * 2, 20)
 
-    title = get_title(opts[:title], conf.title_width)
-
-    main =
-      conf.y_range
-      |> Enum.reverse()
-      |> Enum.map(fn i ->
-        [
-          [
-            pad(i * conf.scaler_y, 4),
-            conf.y_label_postfix,
-            32,
-            ?|,
-            32
-            | Enum.map(conf.x_range, &[grid[{&1, i}] || conf.empty_char, 32])
-          ],
-          10
-        ]
-      end)
-
-    # |> add_leader.()
-    # |> add_x_labels(opts[:labels], x_count, conf.scaler_x)
-
     [
-      10,
+      @nl,
       get_title(opts[:title], conf.title_width),
-      main,
-      leader,
-      x_axis,
-      add_x_labels(opts[:labels], x_count, conf.scaler_x)
+      create_main_plot(scaled_items, conf),
+      create_x_axis(conf),
+      create_x_labels(opts[:labels], x_count, conf.scaler_x)
     ]
   end
 
+  @doc """
+  Generate and print a chart.
+
+  Calls generate/2 and prints the result.
+
+  See Etop.Chart.generate/2 for more information.
+  """
   def puts(items, opts \\ []) do
     items
     |> generate(opts)
@@ -101,13 +106,54 @@ defmodule Etop.Chart do
     Map.merge(%{y_range: y_range(config.min_y, config.max_y), x_range: 0..config.len}, config)
   end
 
-  defp add_x_labels(nil, x_count, scaler_x) do
-    items = for i <- 1..x_count, do: center(to_string(i * 10 * scaler_x), 20)
-    # list ++ ["\n                " | items]
-    [10, repeat(32, 16), items]
+  defp create_grid(scaled_items, plot_char) do
+    scaled_items
+    |> Enum.with_index()
+    |> Enum.reduce(%{}, fn {num, i}, acc ->
+      Map.put(acc, {i, num}, plot_char)
+    end)
   end
 
-  defp add_x_labels(labels, _, scaler_x) do
+  defp create_main_plot(scaled_items, conf) do
+    grid = create_grid(scaled_items, conf.plot_char)
+
+    conf.y_range
+    |> Enum.reverse()
+    |> Enum.map(fn i ->
+      [
+        [
+          pad(i * conf.scaler_y, 4),
+          conf.y_label_postfix,
+          @space,
+          ?|,
+          @space
+          | Enum.map(conf.x_range, &[grid[{&1, i}] || conf.empty_char, @space])
+        ],
+        @nl
+      ]
+    end)
+  end
+
+  defp create_x_axis(conf) do
+    x_axis = List.flatten(for _ <- conf.x_range, do: [?-, ?-])
+
+    x_axis =
+      x_axis
+      |> Enum.chunk_every(20, 20, [])
+      |> Enum.map(fn [_ | list] ->
+        char = if length(list) == 19, do: ?+, else: ?-
+        list ++ [char]
+      end)
+
+    [repeat(@space, String.length(conf.y_label_postfix) + 5), ?+ | x_axis]
+  end
+
+  defp create_x_labels(nil, x_count, scaler_x) do
+    items = for i <- 1..x_count, do: center(to_string(i * 10 * scaler_x), 20)
+    [@nl, repeat(@space, 16), items]
+  end
+
+  defp create_x_labels(labels, _, scaler_x) do
     chunk = 10 * scaler_x
 
     items =
@@ -118,34 +164,7 @@ defmodule Etop.Chart do
         center(hd(list), 20)
       end)
 
-    # list ++ ["\n                " | items]
-    [10, repeat(32, 16), items]
-  end
-
-  defp repeat(char, len) do
-    for _ <- 1..len, do: char
-  end
-
-  defp create_grid(scaled_items, plot_char) do
-    scaled_items
-    |> Enum.with_index()
-    |> Enum.reduce(%{}, fn {num, i}, acc ->
-      Map.put(acc, {i, num}, plot_char)
-    end)
-  end
-
-  defp create_x_axis(x_range) do
-    x_axis = List.flatten(for _ <- x_range, do: [?-, ?-])
-
-    x_axis =
-      x_axis
-      |> Enum.chunk_every(20, 20, [])
-      |> Enum.map(fn [_ | list] ->
-        char = if length(list) == 19, do: ?+, else: ?-
-        list ++ [char]
-      end)
-
-    [?+ | x_axis]
+    [@nl, repeat(@space, 16), items]
   end
 
   defp get_config(items, opts) do
@@ -185,15 +204,19 @@ defmodule Etop.Chart do
     len = String.length(title)
     width = width
 
-    leader = for _ <- 1..7, do: 32
+    leader = repeat(@space, 7)
 
     [
-      [leader, title |> center(width), 10],
-      [leader, for(_ <- 1..len, do: ?-) |> center(width), 10]
+      [leader, title |> center(width), @nl],
+      [leader, for(_ <- 1..len, do: ?-) |> center(width), @nl]
     ]
   end
 
   defp get_title(_, _), do: []
+
+  defp repeat(char, len) do
+    for _ <- 1..len, do: char
+  end
 
   defp scale_items(items, conf) do
     leftover = for _ <- 1..conf.scaler_x, do: 0

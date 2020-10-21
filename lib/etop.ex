@@ -1,6 +1,35 @@
 defmodule Etop do
   @moduledoc """
   A Top like implementation for Elixir Applications.
+
+  ## Usage
+
+      # Start with default options
+      iex> Etop.start()
+
+      # Temporarily pause/stop
+      iex> Etop.pause()
+
+      # Restart when paused
+      iex> Etop.start
+
+      # Start logging to an exs file
+      iex> Etop.start file: "/tmp/etop.exs"
+
+      # Load the current exs file
+      iex> data = Etop.load
+
+      # Start then change number of processes and interval between collecting results
+      iex> Etop.start
+      iex> Etop.set_opts nprocs: 15, interval: 15_000
+
+      # or
+      iex> Etop.start
+      iex> Etop.pause
+      iex> Etop.start nprocs: 15, interval: 15_000
+
+      # Stop Etop, killing its GenServer
+      iex> Etop.stop
   """
   use GenServer
 
@@ -14,10 +43,16 @@ defmodule Etop do
   ###############
   # Public API
 
+  @doc """
+  Load the current exs log file.
+  """
   def load do
     GenServer.call(@name, :load)
   end
 
+  @doc """
+  Pause a running Etop session.
+  """
   def pause do
     GenServer.call(@name, :pause)
   end
@@ -88,11 +123,6 @@ defmodule Etop do
       Node.connect(node)
     end
 
-    # nprocs = :process_count |> :erlang.system_info() |> to_string()
-    # memory = Enum.into(:erlang.memory(), %{})
-    # runq: statistics(:run_queue)
-    # util2 = CpuUtil.pid_util(os_pid)
-    # {%{state | load: CpuUtil.calc_pid_util(util1, util2, cores)}, util2}
     {:ok,
      set_file(
        %{
@@ -118,10 +148,6 @@ defmodule Etop do
        opts
      )}
   end
-
-  # def cpu_util(fun, args, true), do: apply(CpuUtil, fun, args)
-
-  # def cpu_util(_, _, _), nil
 
   def handle_call(:status, _, state) do
     reply(state, Map.delete(state, :prev))
@@ -171,8 +197,9 @@ defmodule Etop do
 
   def handle_info({:result, stats}, state) do
     Logger.debug(fn -> "handle_info :result" end)
-    # IO.inspect(stats, label: ":result stats")
     # Process the the main data and wait for info event {:info_response, info_map}
+    stats = Map.put(stats, :node, state.node || "nonode@nohost")
+
     state
     |> Reader.handle_collect(stats)
     |> Report.handle_report()
@@ -189,6 +216,7 @@ defmodule Etop do
     # Start collecting the data. The summary and process data will be received by
     # info message {:result, stats}
     Reader.remote_stats(state)
+
     noreply(state |> start_timer())
   end
 
@@ -197,14 +225,13 @@ defmodule Etop do
   end
 
   def handle_info(event, state) do
-    IO.inspect(event, label: "handle_info")
-    # silently ignore unhandled info messages
+    Logger.debug(fn -> "unexpected info event #{inspect(event)}" end)
     noreply(state)
   end
 
   def terminate(reason, state) do
     cancel_timer(state)
-    IO.inspect(reason, label: "terminate")
+    Logger.debug(fn -> "terminate #{inspect(reason)}" end)
     if cpu_sup?(), do: :cpu_sup.stop()
     :ok
   end

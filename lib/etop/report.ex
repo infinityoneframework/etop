@@ -6,6 +6,7 @@ defmodule Etop.Report do
 
   Example output of :etop output
 
+  ```
   ========================================================================================
    nonode@nohost                                                             14:21:44
    Load:  cpu         0               Memory:  total      120652    binary       8186
@@ -25,6 +26,7 @@ defmodule Etop.Report do
   <0.948.0>      'Elixir.UcxWallboard     '-'    1046   42404       0 gen_server:loop/7
   <0.615.0>      'Elixir.DBConnection     '-'     949   29716       0 gen_server:loop/7
   ========================================================================================
+  ```
   """
   import Etop.Utils, only: [pad: 2, pad_t: 2]
 
@@ -78,17 +80,72 @@ defmodule Etop.Report do
 
   """
 
-  @leader "  "
-  @leader1 @leader <> @leader
-  # @leader2 @leader <> @leader <> @leader
-
   @doc """
   Get the column with of the given column number.
   """
   def column_width(n), do: Enum.at(@cols, n)
 
+  @doc """
+  Create a report of the given processes list, and summary stats.
+  """
+  def create_report(list, total, stats) do
+    stats
+    |> create_summary()
+    |> create_details(list, total)
+  end
+
+  @doc """
+  Get the data loaded by compiling the output exs file.
+  """
   def get do
     if function_exported?(Etop.Agent, :get, 0), do: apply(Etop.Agent, :get, []), else: nil
+  end
+
+  @doc """
+  Helper to create and output the report.
+
+  Output options:
+
+  * print to current leader
+  * save text format to file
+  * save executable format to exs file
+  """
+  def handle_report(state) do
+    %{list: list, total: total, stats: stats} = state
+
+    list
+    |> create_report(total, stats)
+    |> save_or_print(state)
+  end
+
+  @doc """
+  Map the given list to the given extract fields.
+  """
+  def list(entries, fields) when is_list(fields), do: Enum.map(entries, &get_in(&1, fields))
+
+  @doc """
+  Map the given list.
+  """
+  def list(entries, scope, field), do: list(entries, [:summary, scope, field])
+
+  @doc """
+  List the cpu usage values.
+  """
+  def list_cpu(entries), do: list(entries, :load, :cpu)
+
+  @doc """
+  List the memory usage fields.
+  """
+  def list_memory(entries, field \\ :total), do: list(entries, :memory, field)
+
+  @doc """
+  Load the given exs file.
+  """
+  def load(path \\ "/tmp/etop.exs") do
+    case Code.eval_file(path) do
+      {:ok, _} -> get()
+      error -> error
+    end
   end
 
   @doc """
@@ -110,13 +167,46 @@ defmodule Etop.Report do
     max
   end
 
-  def load(path \\ "/tmp/etop.exs") do
-    case Code.eval_file(path) do
-      {:ok, _} -> get()
-      error -> error
-    end
+  @doc """
+  Print a chart of the given data.
+  """
+  def plot(list, opts \\ []), do: Chart.puts(list, opts)
+
+  @doc """
+  Print a chart of the cpu usage.
+  """
+  def plot_cpu(entries, opts \\ []) do
+    labels = list(entries, [:summary, :time])
+
+    entries
+    |> list_cpu()
+    |> plot(Keyword.merge([y_label_postfix: "%", title: "CPU Utilization", labels: labels], opts))
   end
 
+  @doc """
+  Print a chart of the memory usage.
+  """
+  def plot_memory(entries, opts \\ []) do
+    field = opts[:field] || :total
+
+    labels = list(entries, [:summary, :time])
+
+    entries
+    |> list(:memory, field)
+    |> Enum.map(&(&1 / (1024 * 1024)))
+    |> plot(
+      Keyword.merge(
+        [width: 80, height: 50, y_label_postfix: "MB", title: "Memory Usage", labels: labels],
+        opts
+      )
+    )
+  end
+
+  @doc """
+  Print a report.
+
+  Prints a single top entry or a list of top entries to leader or the given file.
+  """
   def print(entry, file \\ nil)
 
   def print(entries, file) when is_list(entries) do
@@ -135,12 +225,112 @@ defmodule Etop.Report do
     |> write_report(file)
   end
 
+  @doc """
+  Save a report in Elixir terms format.
+
+  Saves the report so that it can be later loaded and analyzed.
+  """
+  def save_exs_report(report, path) do
+    exists? = File.exists?(path)
+
+    File.open(path, [:append], fn fp ->
+      unless exists?, do: IO.puts(fp, @exs_template)
+
+      IO.puts(fp, [
+        "A.add(",
+        inspect(report, limit: :infinity),
+        ?),
+        10
+      ])
+    end)
+  end
+
+  @doc """
+  Get to top entries.
+  """
+  def top(entries, num) do
+    entries
+    |> sort_by_load()
+    |> Enum.take(num)
+  end
+
+  ###############
+  # Private
+
+  defp create_details(report, list, total) do
+    l2 = column_width(1)
+
+    items =
+      list
+      |> Enum.reduce([], fn {pid, reds}, acc ->
+        diff = reds.reductions_diff
+
+        try do
+          percent = to_string(Float.round(diff / total * 100, 2)) <> "%"
+
+          item = %{
+            pid: :erlang.pid_to_list(pid),
+            name: name_or_initial_fun(reds, l2),
+            percent: percent,
+            reductions: reds.reductions,
+            reds_diff: diff,
+            memory: reds.memory,
+            msg_q: reds.message_queue_len,
+            state: reds.status,
+            fun: format_fun(reds.current_function)
+          }
+
+          [item | acc]
+        rescue
+          e ->
+            IO.inspect(e)
+            IO.inspect(%{diff: diff, reds: reds, total: total}, label: "Bad result")
+            acc
+        end
+      end)
+      |> Enum.reverse()
+
+    Map.put(report, :processes, items)
+  end
+
+  defp create_summary(stats) do
+    time = Utils.local_time() |> NaiveDateTime.to_time() |> to_string()
+    cpu = if stats.load, do: to_string(stats.load.total) <> "%", else: "-"
+
+    %{
+      summary: %{
+        node: stats.node,
+        time: time,
+        load: %{
+          cpu: cpu,
+          nprocs: stats.nprocs,
+          runq: stats.runq
+        },
+        memory: stats.memory
+      }
+    }
+  end
+
+  defp dict_initial_call(%{dictionary: dict}) when is_list(dict), do: dict[:"$initial_call"]
+  defp dict_initial_call(_), do: nil
+
+  defp format_fun({mod, fun, arity}), do: "#{inspect(mod)}.#{fun}/#{arity}"
+  defp format_fun(str) when is_binary(str), do: str
+  defp format_fun(_), do: ""
+
+  defp name_or_initial_fun(reds, l2) do
+    reds[:registerd_name]
+    |> case do
+      nil -> format_fun(dict_initial_call(reds) || reds[:initial_call])
+      name when is_atom(name) -> name
+    end
+    |> to_string()
+    |> String.replace(~r/^Elixir\./, "")
+    |> String.slice(0, l2)
+  end
+
   defp print_process(report, entry) do
     [l1, l2, l3, l4, l5, l6, l7, _l8] = @cols
-
-    # IEx.pry()
-
-    # IO.inspect(hd(entry.processes |> Enum.to_list()), label: "processes")
 
     entry.processes
     |> Enum.reduce(report, fn p, report ->
@@ -163,8 +353,8 @@ defmodule Etop.Report do
         )
       rescue
         e ->
-          IO.inspect(e)
-          IO.inspect(p, label: "Bad result")
+          Logger.warn(inspect(e))
+          Logger.warn("Bad result: " <> inspect(p))
           report
       end
     end)
@@ -176,8 +366,11 @@ defmodule Etop.Report do
     load = summary.load
     memory = summary.memory
 
+    node = summary.node
+    node_len = String.length(node)
+
     report
-    |> puts(pad(summary.time, @report_width))
+    |> puts(node <> pad(summary.time, @report_width - node_len))
     |> summary_line(
       "Load:  cpu  ",
       load.cpu,
@@ -208,22 +401,14 @@ defmodule Etop.Report do
     ["\n", string | report]
   end
 
-  def save_eex_report(report, path) do
-    exists? = File.exists?(path)
+  defp save_or_print(report, %{format: :exs, file: path}) when is_binary(path),
+    do: save_exs_report(report, path)
 
-    File.open(path, [:append], fn fp ->
-      unless exists?, do: IO.puts(fp, @exs_template)
-      IO.puts(fp, "A.add(%{")
-      IO.puts(fp, @leader <> "summary: " <> inspect(report.summary, pretty: true) <> ",")
-      IO.puts(fp, @leader <> "processes: [")
+  defp save_or_print(report, %{file: path}),
+    do: print(report, path)
 
-      Enum.each(report.processes, fn item ->
-        IO.puts(fp, @leader1 <> inspect(item, pretty: true) <> ",")
-      end)
-
-      IO.puts(fp, @leader <> "]")
-      IO.puts(fp, "})\n##########\n")
-    end)
+  defp sort_by_load(entries, sorter \\ &>/2) do
+    Enum.sort_by(entries, &get_in(&1, [:summary, :load, :cpu]), sorter)
   end
 
   defp summary_line(report, load_label, load, mem1_label, mem1, mem2_label, mem2) do
@@ -233,16 +418,6 @@ defmodule Etop.Report do
         pad(load, 7) <>
         pad(mem1_label, 40) <> pad(mem1, 15) <> pad_t(mem2_label, 11) <> pad(mem2, 10)
     )
-  end
-
-  def sort_by_load(entries, sorter \\ &>/2) do
-    Enum.sort_by(entries, &get_in(&1, [:summary, :load, :cpu]), sorter)
-  end
-
-  def top(entries, num) do
-    entries
-    |> sort_by_load()
-    |> Enum.take(num)
   end
 
   defp write_report(report, file) when is_binary(file) do
@@ -255,134 +430,4 @@ defmodule Etop.Report do
   defp write_report(report, _) do
     IO.puts(report)
   end
-
-  def list(entries, fields) when is_list(fields), do: Enum.map(entries, &get_in(&1, fields))
-
-  def list(entries, scope, field), do: list(entries, [:summary, scope, field])
-
-  def list_cpu(entries), do: list(entries, :load, :cpu)
-
-  def list_memory(entries, field \\ :total), do: list(entries, :memory, field)
-
-  def plot_cpu(entries, opts \\ []) do
-    labels = list(entries, [:summary, :time])
-
-    entries
-    |> list_cpu()
-    |> plot(Keyword.merge([y_label_postfix: "%", title: "CPU Utilization", labels: labels], opts))
-  end
-
-  def plot_memory(entries, opts \\ []) do
-    field = opts[:field] || :total
-
-    labels = list(entries, [:summary, :time])
-
-    entries
-    |> list(:memory, field)
-    |> Enum.map(&(&1 / (1024 * 1024)))
-    |> plot(
-      Keyword.merge(
-        [width: 80, height: 50, y_label_postfix: "MB", title: "Memory Usage", labels: labels],
-        opts
-      )
-    )
-  end
-
-  def plot(list, opts \\ []), do: Chart.puts(list, opts)
-
-  def create_report(list, total, stats) do
-    stats
-    |> create_summary()
-    |> create_details(list, total)
-  end
-
-  defp create_details(report, list, total) do
-    l2 = column_width(1)
-
-    items =
-      list
-      |> Enum.reduce([], fn {pid, reds}, acc ->
-        diff = reds.reductions_diff
-
-        try do
-          percent = to_string(Float.round(diff / total * 100, 2)) <> "%"
-
-          # pid_str = pid |> inspect() |> String.trim_leading("#PID") |>
-
-          item = %{
-            pid: :erlang.pid_to_list(pid),
-            name: name_or_initial_fun(reds, l2),
-            percent: percent,
-            reductions: reds.reductions,
-            reds_diff: diff,
-            memory: reds.memory,
-            msg_q: reds.message_queue_len,
-            state: reds.status,
-            fun: format_fun(reds.current_function)
-          }
-
-          [item | acc]
-        rescue
-          e ->
-            IO.inspect(e)
-            IO.inspect(%{diff: diff, reds: reds, total: total}, label: "Bad result")
-            acc
-        end
-      end)
-      |> Enum.reverse()
-
-    Map.put(report, :processes, items)
-  end
-
-  # nprocs = :process_count |> :erlang.system_info() |> to_string()
-  # memory = Enum.into(:erlang.memory(), %{})
-  # runq: statistics(:run_queue)
-  defp create_summary(stats) do
-    time = Utils.local_time() |> NaiveDateTime.to_time() |> to_string()
-    cpu = if stats.load, do: stats.load.total, else: "-"
-
-    %{
-      summary: %{
-        time: time,
-        load: %{
-          cpu: cpu,
-          nprocs: stats.nprocs,
-          runq: stats.runq
-        },
-        memory: stats.memory
-      }
-    }
-  end
-
-  defp name_or_initial_fun(reds, l2) do
-    reds[:registerd_name]
-    |> case do
-      nil -> format_fun(dict_initial_call(reds) || reds[:initial_call])
-      name when is_atom(name) -> name
-    end
-    |> to_string()
-    |> String.replace(~r/^Elixir\./, "")
-    |> String.slice(0, l2)
-  end
-
-  defp dict_initial_call(%{dictionary: dict}) when is_list(dict), do: dict[:"$initial_call"]
-  defp dict_initial_call(_), do: nil
-
-  def handle_report(state) do
-    %{list: list, total: total, stats: stats} = state
-
-    list
-    |> create_report(total, stats)
-    |> save_or_print(state)
-  end
-
-  defp save_or_print(report, %{format: :exs, file: path}) when is_binary(path),
-    do: save_eex_report(report, path)
-
-  defp save_or_print(report, %{file: path}),
-    do: print(report, path)
-
-  def format_fun({mod, fun, arity}), do: "#{inspect(mod)}.#{fun}/#{arity}"
-  def format_fun(str) when is_binary(str), do: str
-  def format_fun(_), do: ""
 end
