@@ -266,7 +266,7 @@ defmodule Etop.Report do
         diff = reds.reductions_diff
 
         try do
-          percent = to_string(Float.round(diff / total * 100, 2)) <> "%"
+          percent = Float.round(diff / total * 100, 2)
 
           item = %{
             pid: :erlang.pid_to_list(pid),
@@ -295,7 +295,7 @@ defmodule Etop.Report do
 
   defp create_summary(stats) do
     time = Utils.local_time() |> NaiveDateTime.to_time() |> to_string()
-    cpu = if stats.load, do: to_string(stats.load.total) <> "%", else: "-"
+    cpu = if stats.load, do: stats.load.total, else: "-"
 
     %{
       summary: %{
@@ -373,7 +373,7 @@ defmodule Etop.Report do
     |> puts(node <> pad(summary.time, @report_width - node_len))
     |> summary_line(
       "Load:  cpu  ",
-      load.cpu,
+      to_string(load.cpu) <> "%",
       "Memory:  total    ",
       memory.total,
       "     binary",
