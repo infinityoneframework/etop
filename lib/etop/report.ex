@@ -116,6 +116,8 @@ defmodule Etop.Report do
     list
     |> create_report(total, stats)
     |> save_or_print(state)
+
+    state
   end
 
   @doc """

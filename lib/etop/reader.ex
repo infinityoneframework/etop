@@ -17,6 +17,18 @@ defmodule Etop.Reader do
   require Logger
 
   @doc """
+  Get the number of CPU Cores.
+  """
+  def core_count do
+    with topology <- :erlang.system_info(:cpu_topology),
+         processors when is_list(processors) <- topology[:processor] do
+      {:ok, length(processors)}
+    else
+      _ -> :error
+    end
+  end
+
+  @doc """
   Handle the timer timeout.
 
   Collect and report the Top information.
@@ -24,25 +36,15 @@ defmodule Etop.Reader do
   def handle_collect(state, stats) do
     Logger.debug(fn -> "handle_collect start" end)
 
-    util2 =
-      case stats[:util2] do
-        {:ok, contents} ->
-          CpuUtil.pid_util(contents)
+    # parse the util response and calculate load
+    {load, util} = calculate_load(stats.util, state.util, state.cores)
 
-        _ ->
-          nil
-      end
+    stats =
+      %{stats | procs: parse_system_info(stats.procs)}
+      |> Map.put(:load, load)
+      |> Map.put(:util, util)
 
-    load =
-      if util2 do
-        CpuUtil.calc_pid_util(state.util, util2, state.cores)
-      else
-        nil
-      end
-
-    stats = %{stats | procs: parse_system_info(stats.procs), load: load, util2: util2}
-
-    {current, total} = calc_reductions(stats.procs, state.prev)
+    {current, total} = calculate_reductions(stats.procs, state.prev)
 
     list =
       current
@@ -50,7 +52,55 @@ defmodule Etop.Reader do
       |> Enum.take(state.nprocs)
 
     Logger.debug(fn -> "handle_collect done" end)
-    %{state | prev: stats.procs, util: util2, total: total, stats: stats, list: list}
+    %{state | prev: stats.procs, util: util, total: total, stats: stats, list: list}
+  end
+
+  @doc """
+  Fetch the initial CPU information.
+
+  Gets the os_pid and core count.
+  """
+  def remote_cpu_info(%{node: node}) when is_nil(node) do
+    os_pid = os_pid()
+
+    send(
+      self(),
+      {:cpu_info_result,
+       %{
+         cores: core_count(),
+         os_pid: os_pid,
+         util: read_stats(os_pid)
+       }}
+    )
+  end
+
+  def remote_cpu_info(%{node: node}) when is_atom(node) do
+    pid = self()
+
+    core_count = fn ->
+      with topology <- :erlang.system_info(:cpu_topology),
+           processors when is_list(processors) <- topology[:processor] do
+        {:ok, length(processors)}
+      else
+        _ -> :error
+      end
+    end
+
+    os_pid = fn -> List.to_integer(:os.getpid()) end
+
+    Node.spawn_link(node, fn ->
+      os_pid = os_pid.()
+
+      send(
+        pid,
+        {:cpu_info_result,
+         %{
+           cores: core_count.(),
+           os_pid: os_pid,
+           util: {File.read("/proc/stat"), File.read("/proc/#{os_pid}/stat")}
+         }}
+      )
+    end)
   end
 
   @doc """
@@ -68,13 +118,12 @@ defmodule Etop.Reader do
 
   NOTE: remote nodes are not working.
   """
-  def remote_stats(%{node: node, os_pid: os_pid}) when not is_nil(node) do
+  def remote_stats(%{node: node}) when not is_nil(node) do
     # TODO: This isn't working. It works if I call this directly from iex>,
     # but raises an error its called from the GenServer.
     # Also note that the code below is duplicate code. Once It works, it should
     # be refactored to use the same as the local version.
 
-    # IO.inspect(node, label: "remote_stats")
     pid = self()
 
     Node.spawn_link(node, fn ->
@@ -84,19 +133,18 @@ defmodule Etop.Reader do
          %{
            procs:
              Process.list()
-             |> Enum.map(
-               &{&1, Keyword.put(Process.info(&1), :memory, :erlang.process_info(&1, :memory))}
-             ),
+             |> Enum.map(fn ppid ->
+               if info = Process.info(ppid),
+                 do: {ppid, Keyword.put(info, :memory, :erlang.process_info(ppid, :memory))},
+                 else: nil
+             end),
            nprocs: :process_count |> :erlang.system_info() |> to_string(),
            memory: Enum.into(:erlang.memory(), %{}),
            runq: :erlang.statistics(:run_queue),
-           util2: File.read("/proc/#{os_pid}/stat"),
-           load: nil
+           util: {File.read("/proc/stat"), File.read("/proc/#{pid}/stat")}
          }}
       )
     end)
-
-    # IO.puts("ran remote_stats")
   end
 
   def remote_stats(state) do
@@ -126,7 +174,20 @@ defmodule Etop.Reader do
   ###############
   # Private
 
-  defp calc_reductions(curr, prev) do
+  defp calculate_load({_, _} = curr, {_, _} = prev, cores) do
+    curr = parse_util(curr)
+    {CpuUtil.process_util(parse_util(prev), curr, cores: cores), curr}
+  end
+
+  defp calculate_load({_, _} = curr, _, _) do
+    {nil, parse_util(curr)}
+  end
+
+  defp calculate_load(_, _, _) do
+    {nil, nil}
+  end
+
+  defp calculate_reductions(curr, prev) do
     prev = if prev, do: prev, else: %{}
 
     Enum.reduce(curr, {[], 0}, fn {pid, settings}, {acc, total} ->
@@ -144,14 +205,15 @@ defmodule Etop.Reader do
     do: %{
       procs:
         Process.list()
-        |> Enum.map(
-          &{&1, Keyword.put(Process.info(&1), :memory, :erlang.process_info(&1, :memory))}
-        ),
+        |> Enum.map(fn ppid ->
+          if info = Process.info(ppid),
+            do: {ppid, Keyword.put(info, :memory, :erlang.process_info(ppid, :memory))},
+            else: nil
+        end),
       nprocs: :process_count |> :erlang.system_info() |> to_string(),
       memory: Enum.into(:erlang.memory(), %{}),
       runq: :erlang.statistics(:run_queue),
-      util2: File.read("/proc/#{pid}/stat"),
-      load: nil
+      util: read_stats(pid)
     }
 
   defp info_map_memory(%{} = item) do
@@ -168,6 +230,10 @@ defmodule Etop.Reader do
     |> info_map_memory()
   end
 
+  defp os_pid do
+    List.to_integer(:os.getpid())
+  end
+
   defp parse_system_info(info) do
     info
     |> Enum.map(fn {pid, item} ->
@@ -178,4 +244,10 @@ defmodule Etop.Reader do
     end)
     |> Enum.into(%{})
   end
+
+  defp parse_util({{:ok, stat}, {:ok, statp}}), do: {stat, statp}
+  defp parse_util({stat, statp} = util) when is_binary(stat) and is_binary(statp), do: util
+  defp parse_util(_), do: nil
+
+  defp read_stats(os_pid), do: {File.read("/proc/stat"), File.read("/proc/#{os_pid}/stat")}
 end

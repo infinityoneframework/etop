@@ -5,31 +5,31 @@ defmodule Etop do
   ## Usage
 
       # Start with default options
-      iex> Etop.start()
+      ex> Etop.start()
 
       # Temporarily pause/stop
-      iex> Etop.pause()
+      ex> Etop.pause()
 
       # Restart when paused
-      iex> Etop.start
+      ex> Etop.start
 
       # Start logging to an exs file
-      iex> Etop.start file: "/tmp/etop.exs"
+      ex> Etop.start file: "/tmp/etop.exs"
 
       # Load the current exs file
-      iex> data = Etop.load
+      ex> data = Etop.load
 
       # Start then change number of processes and interval between collecting results
-      iex> Etop.start
-      iex> Etop.set_opts nprocs: 15, interval: 15_000
+      ex> Etop.start
+      ex> Etop.set_opts nprocs: 15, interval: 15_000
 
       # or
-      iex> Etop.start
-      iex> Etop.pause
-      iex> Etop.start nprocs: 15, interval: 15_000
+      ex> Etop.start
+      ex> Etop.pause
+      ex> Etop.start nprocs: 15, interval: 15_000
 
       # Stop Etop, killing its GenServer
-      iex> Etop.stop
+      ex> Etop.stop
   """
   use GenServer
 
@@ -38,7 +38,7 @@ defmodule Etop do
   require Logger
 
   @name __MODULE__
-  @valid_opts ~w(freq length debug file os_pid cores format interval npocs)a
+  @valid_opts ~w(freq length debug file os_pid cores format interval nprocs)a
 
   ###############
   # Public API
@@ -101,23 +101,9 @@ defmodule Etop do
   # GenServer Callbacks
 
   def init(opts) do
-    # Run the report in 1 second.
-    Process.send_after(self(), :collect, 1000)
+    send(self(), :initialize)
 
     cpu_util? = Keyword.get(opts, :cpu_util, true)
-
-    if cpu_sup?(), do: :cpu_sup.start()
-
-    os_pid = CpuUtil.getpid()
-
-    cores =
-      if cpu_util? do
-        with {:ok, cores} <- CpuUtil.num_cores(), do: cores
-      else
-        1
-      end
-
-    util = if cpu_util?, do: CpuUtil.pid_util(os_pid), else: nil
 
     if node = opts[:node] do
       Node.connect(node)
@@ -127,7 +113,7 @@ defmodule Etop do
      set_file(
        %{
          cpu_util?: cpu_util?,
-         cores: cores,
+         cores: opts[:cores] || 1,
          debug: opts[:debug] || false,
          file: nil,
          format: nil,
@@ -138,12 +124,12 @@ defmodule Etop do
          load: nil,
          node: opts[:node],
          nprocs: opts[:nprocs] || opts[:length] || 10,
-         os_pid: os_pid,
+         os_pid: opts[:os_pid],
          prev: nil,
          stats: nil,
          timer_ref: nil,
          total: 0,
-         util: util
+         util: opts[:util]
        },
        opts
      )}
@@ -195,16 +181,33 @@ defmodule Etop do
     {:stop, :normal, state}
   end
 
+  def handle_info({:cpu_info_result, info}, state) do
+    info = sanitize_info_result(info)
+
+    noreply(%{state | cores: info.cores, os_pid: info.os_pid, util: info.util})
+  end
+
+  def handle_info(:initialize, state) do
+    # Run the report in 1 second.
+    Process.send_after(self(), :collect, 1000)
+
+    if cpu_sup?(), do: :cpu_sup.start()
+
+    Reader.remote_cpu_info(state)
+
+    noreply(state)
+  end
+
   def handle_info({:result, stats}, state) do
     Logger.debug(fn -> "handle_info :result" end)
     # Process the the main data and wait for info event {:info_response, info_map}
-    stats = Map.put(stats, :node, state.node || "nonode@nohost")
+
+    stats = sanitize_stats(state, stats)
 
     state
     |> Reader.handle_collect(stats)
     |> Report.handle_report()
-
-    noreply(state)
+    |> noreply()
   end
 
   def handle_info(:collect, %{halted: true} = state) do
@@ -240,6 +243,18 @@ defmodule Etop do
   # Helpers
 
   def statistics(item), do: :erlang.statistics(item)
+
+  def sanitize_stats(state, stats) do
+    stats
+    |> Map.put(:node, state.node || "nonode@nohost")
+    |> Map.put(:procs, Enum.reject(stats.procs, &is_nil/1))
+  end
+
+  def sanitize_info_result(info) do
+    info
+    |> sanitize_info_result(:util)
+    |> sanitize_info_result(:cores, 1)
+  end
 
   #########
   # Private
@@ -303,6 +318,20 @@ defmodule Etop do
 
   defp noreply(%{} = state), do: {:noreply, state}
   defp noreply(state), do: raise("invalid state: #{inspect(state)}")
+
+  defp sanitize_info_result(info, field, default \\ nil)
+
+  defp sanitize_info_result(%{util: {{:ok, stat}, {:ok, statp}}} = info, :util, _) do
+    %{info | util: {stat, statp}}
+  end
+
+  defp sanitize_info_result(%{cores: {:ok, cores}} = info, :cores, _) do
+    %{info | cores: cores}
+  end
+
+  defp sanitize_info_result(info, field, default) do
+    Map.put(info, field, default)
+  end
 
   defp valid_opts?(opts) do
     opts

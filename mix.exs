@@ -4,9 +4,10 @@ defmodule Etop.MixProject do
   def project do
     [
       app: :etop,
-      version: "0.1.0",
+      version: "0.2.0",
       elixir: "~> 1.7",
       start_permanent: Mix.env() == :prod,
+      elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps(),
       name: "Etop",
       package: package(),
@@ -27,11 +28,14 @@ defmodule Etop.MixProject do
     ]
   end
 
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
+
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      # {:cpu_util, path: "../cpu_util"},
-      {:cpu_util, "~> 0.1"},
+      {:cpu_util, path: "../cpu_util"},
+      # {:cpu_util, "~> 0.1"},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:ex_doc, "~> 0.22.0", override: true, only: :dev, runtime: false}
     ]

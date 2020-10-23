@@ -1,5 +1,18 @@
 # Etop Changelog
 
+## 0.2.0 (2020-10-24)
+
+### Bug fixes
+
+* Fix dead process exception
+* Fix CPU utilization
+
+### Known Issues
+
+* Remote node is not working
+* Only works on Linux
+
+
 ## 0.1.1 (2020-10-22)
 
 ### Bug fixes
