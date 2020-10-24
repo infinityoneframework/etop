@@ -19,7 +19,7 @@ use Mix.Config
 # You can also configure a 3rd-party app:
 #
 config :logger,
-  level: :debug,
+  level: :info,
   format: "$time [$level]$levelpad$metadata$message\n",
   metadata: [:module, :function, :line]
 

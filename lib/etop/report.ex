@@ -1,31 +1,31 @@
 defmodule Etop.Report do
   @moduledoc """
-  ETOP Reporting Helpers.
+  Etop Reporting Helpers.
 
   A set of functions to use to parse and process Etop results.
 
-  Example output of :etop output
+  Example output
 
   ```
-  ========================================================================================
-   nonode@nohost                                                             14:21:44
-   Load:  cpu         0               Memory:  total      120652    binary       8186
-          procs     538                        processes   58065    code        28599
-          runq        0                        atom         1498    ets          8615
+  ===========================================================================================================================
+  nonode@nohost                                                                                                      08:22:56
+  Load:  cpu     2.9%                      Memory:  total           42812208     binary    197472
+         procs     92                               processes       23093664     code    10223211
+         runq       0                                atom             512625      ets      791672
 
-  Pid            Name or Initial Func    Time    Reds  Memory    MsgQ Current Function
-  ----------------------------------------------------------------------------------------
-  <0.850.0>      'Elixir.InfinityOne.     '-'   32457   90772       0 gen_server:loop/7
-  <0.992.0>      etop_txt:init/1          '-'   18534 1115108       0 etop:update/1
-  <0.459.0>      erlang:apply/2           '-'   15943    5740       0 'Elixir.ExAmi.Reader
-  <0.64.0>       group:server/3           '-'   1250414662300       0 group:server_loop/3
-  <0.935.0>      'Elixir.UcxWallboard     '-'    1210  109380       0 gen_server:loop/7
-  <0.954.0>      'Elixir.UcxWallboard     '-'    1192   75892       0 gen_server:loop/7
-  <0.62.0>       user_drv                 '-'    1150   26612       0 user_drv:server_loop
-  <0.934.0>      'Elixir.UcxWallboard     '-'    1118  142868       0 gen_server:loop/7
-  <0.948.0>      'Elixir.UcxWallboard     '-'    1046   42404       0 gen_server:loop/7
-  <0.615.0>      'Elixir.DBConnection     '-'     949   29716       0 gen_server:loop/7
-  ========================================================================================
+  Pid                        Name or Initial Func  Percent     Reds    Memory MssQ      State Current Function
+  ---------------------------------------------------------------------------------------------------------------------------
+  <0.9.0>                         :erlang.apply/2    47.66   901851    284652    0    waiting :erl_prim_loader.loop/3
+  <0.49.0>                        :erlang.apply/2    12.57   237834    163492    0    waiting :code_server.loop/1
+  <0.43.0>        :application_controller.start/1     8.13   153862    264396    0    waiting :gen_server.loop/7
+  <0.1.0>               :erts_code_purger.start/0     7.44   140798     25848    0    waiting :erts_code_purger.wait_for_request/0
+  <0.2.0>     :erts_literal_area_collector.start/     7.11   134526      2688    0    waiting :erts_literal_area_collector.msg_loop/4
+  <0.57.0>                    :file_server.init/1     6.18   116917    426596    0    waiting :gen_server.loop/7
+  <0.64.0>                        :group.server/3     3.46    65443  10784016    0    waiting :group.more_data/6
+  <0.79.0>                       :disk_log.init/2     1.85    34950    197252    0    waiting :disk_log.loop/1
+  <0.228.0>                           Etop.init/1     1.77    33584   6781840    0    running Process.info/1
+  <0.3.0>     :erts_dirty_process_signal_handler.     1.26    23850      2688    0    waiting :erts_dirty_process_signal_handler.msg_loop/0
+  ===========================================================================================================================
   ```
   """
   import Etop.Utils, only: [pad: 2, pad_t: 2]
@@ -81,7 +81,7 @@ defmodule Etop.Report do
   """
 
   @doc """
-  Get the column with of the given column number.
+  Get the column width of the given column number.
   """
   def column_width(n), do: Enum.at(@cols, n)
 
@@ -248,7 +248,7 @@ defmodule Etop.Report do
   end
 
   @doc """
-  Get to top entries.
+  Get the top n entries.
   """
   def top(entries, num) do
     entries

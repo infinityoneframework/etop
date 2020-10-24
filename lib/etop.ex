@@ -148,12 +148,12 @@ defmodule Etop do
     reply(state, :not_halted)
   end
 
+  def handle_call(:load, _, %{format: :exs, file: file} = state) when is_binary(file) do
+    reply(state, Report.load(file))
+  end
+
   def handle_call(:load, _, state) do
-    if state.format == :exs and is_binary(state.file) do
-      reply(state, Report.load(state.file))
-    else
-      reply(state, {:error, :invalid_file})
-    end
+    reply(state, {:error, :invalid_file})
   end
 
   def handle_call(:pause, _, %{halted: true} = state) do
@@ -165,8 +165,6 @@ defmodule Etop do
   end
 
   def handle_cast({:set_opts, opts}, state) do
-    state = Enum.reduce(opts, state, fn {k, v}, state -> Map.put(state, k, v) end)
-
     state
     |> set_opts(opts)
     |> noreply()
@@ -263,7 +261,7 @@ defmodule Etop do
   end
 
   defp cpu_sup? do
-    if Application.get_env(:infinity_one, :etop_use_cpu_sup),
+    if Application.get_env(:etop, :etop_use_cpu_sup),
       do: function_exported?(:cpu_sup, :start, 0),
       else: false
   end

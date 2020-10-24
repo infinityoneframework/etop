@@ -1,6 +1,6 @@
 defmodule Etop.Chart do
   @moduledoc """
-  Create a ascii charts.
+  Create ASCII charts.
 
   ## Examples
 
@@ -52,7 +52,7 @@ defmodule Etop.Chart do
 
   ## Options
 
-  * height (20) - the height of the y axis
+  * height (20 default) - the height of the y axis
   * width (100) - the width of the x axis
   * y_label_postfix ("") - the appended y axis label
   * title (nil) - Sting printed at the top of the chart

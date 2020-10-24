@@ -6,13 +6,17 @@ defmodule Etop.Utils do
   @doc """
   Center the given string in the given length.
 
+  Return a string of length >= the given length with the given string centered.
+
+  The returned string is padded (leading and trailing) with the given padding (default " ")
+
   ## Examples
 
       iex> Etop.Utils.center("Test", 8)
       "  Test  "
 
-      iex> Etop.Utils.center('Test', 8, "-")
-      "--Test--"
+      iex> Etop.Utils.center('Test', 7, "-")
+      "-Test--"
   """
   @spec center(any(), integer(), String.t()) :: String.t()
   def center(item, len, char \\ " ")
