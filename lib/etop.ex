@@ -120,16 +120,11 @@ defmodule Etop do
          halted: Keyword.get(opts, :halted, false),
          info_map: nil,
          interval: opts[:interval] || opts[:freq] || 5000,
-         list: nil,
-         load: nil,
          node: opts[:node],
          nprocs: opts[:nprocs] || opts[:length] || 10,
          os_pid: opts[:os_pid],
-         prev: nil,
-         stats: nil,
-         timer_ref: nil,
-         total: 0,
-         util: opts[:util]
+         stats: %{util: opts[:util], procs: nil, total: 0, load: nil},
+         timer_ref: nil
        },
        opts
      )}
@@ -181,10 +176,11 @@ defmodule Etop do
     {:stop, :normal, state}
   end
 
-  def handle_info({:cpu_info_result, info}, state) do
+  def handle_info({:cpu_info_result, info}, %{stats: stats} = state) do
     info = sanitize_info_result(info)
+    stats = Map.put(stats, :util, info.util)
 
-    noreply(%{state | cores: info.cores, os_pid: info.os_pid, util: info.util})
+    noreply(%{state | cores: info.cores, os_pid: info.os_pid, stats: stats})
   end
 
   def handle_info(:initialize, state) do

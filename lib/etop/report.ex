@@ -111,9 +111,9 @@ defmodule Etop.Report do
   * save executable format to exs file
   """
   def handle_report(state) do
-    %{list: list, total: total, stats: stats} = state
+    %{stats: %{processes: processes, total: total} = stats} = state
 
-    list
+    processes
     |> create_report(total, stats)
     |> save_or_print(state)
 

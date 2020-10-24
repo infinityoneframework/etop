@@ -74,25 +74,25 @@ defmodule Etop.ReaderTest do
     stats = get_stats(state)
     state = Reader.handle_collect(state, stats)
 
-    assert length(state.list) == 10
+    assert length(state.stats.processes) == 10
 
     assert state.stats.load |> Map.keys() |> Enum.sort() == ~w(sys total user)a
     assert state.stats.load |> Map.values() |> Enum.all?(&is_float/1)
 
-    {a, b} = state.util
+    {a, b} = state.stats.util
     assert is_binary(a) and is_binary(b)
   end
 
   test "handle_connect/2 stats", %{state: state} do
     stats = get_stats(state)
-    %{stats: %{load: load}, total: total} = Reader.handle_collect(state, stats)
+    %{stats: %{load: load, total: total}} = Reader.handle_collect(state, stats)
 
     assert is_integer(total)
     %{total: total} = load
     assert is_float(total)
   end
 
-  test "process_util pairs", %{state: state} do
+  test "process_util pairs" do
     data = Fixtures.proc_stats()
 
     result =
@@ -110,7 +110,7 @@ defmodule Etop.ReaderTest do
            ]
   end
 
-  test "process_util continuous", %{state: state} do
+  test "process_util continuous" do
     data = Fixtures.proc_stats()
 
     {prev, _} = hd(data)
@@ -139,7 +139,7 @@ defmodule Etop.ReaderTest do
     {prev, _} = hd(data)
     samples = Enum.map(data, &elem(&1, 1))
 
-    state = %{state | util: prev}
+    state = %{state | stats: %{state.stats | util: prev}}
 
     {_, acc} =
       Enum.reduce(samples, {state, []}, fn curr, {state, acc} ->

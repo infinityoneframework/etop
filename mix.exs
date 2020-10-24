@@ -34,8 +34,7 @@ defmodule Etop.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:cpu_util, path: "../cpu_util"},
-      # {:cpu_util, "~> 0.1"},
+      {:cpu_util, "~> 0.5"},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:ex_doc, "~> 0.22.0", override: true, only: :dev, runtime: false}
     ]

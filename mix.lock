@@ -1,5 +1,5 @@
 %{
-  "cpu_util": {:hex, :cpu_util, "0.1.0", "2762988e928f822127c7a48b26b560ef8bb3b5fbec755fc37a273698796cec5d", [:mix], [], "hexpm", "b8fb7d8fa359c721d84c8a64ee0410602bc8661546855530e6b705158e902c6c"},
+  "cpu_util": {:hex, :cpu_util, "0.5.0", "7275c1b24b34b677976c067a6dca0eff204b6b1dc3fc903d3c0ba25ff12993a8", [:mix], [], "hexpm", "39864e7a71eb3ad4329a5f66db1abaceaeabbd81b55751fe208fe6e14c3625fb"},
   "earmark_parser": {:hex, :earmark_parser, "1.4.10", "6603d7a603b9c18d3d20db69921527f82ef09990885ed7525003c7fe7dc86c56", [:mix], [], "hexpm", "8e2d5370b732385db2c9b22215c3f59c84ac7dda7ed7e544d7c459496ae519c0"},
   "ex_doc": {:hex, :ex_doc, "0.22.6", "0fb1e09a3e8b69af0ae94c8b4e4df36995d8c88d5ec7dbd35617929144b62c00", [:mix], [{:earmark_parser, "~> 1.4.0", [hex: :earmark_parser, repo: "hexpm", optional: false]}, {:makeup_elixir, "~> 0.14", [hex: :makeup_elixir, repo: "hexpm", optional: false]}], "hexpm", "1e0aceda15faf71f1b0983165e6e7313be628a460e22a031e32913b98edbd638"},
   "file_system": {:hex, :file_system, "0.2.9", "545b9c9d502e8bfa71a5315fac2a923bd060fd9acb797fe6595f54b0f975fd32", [:mix], [], "hexpm", "3cf87a377fe1d93043adeec4889feacf594957226b4f19d5897096d6f61345d8"},

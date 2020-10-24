@@ -36,23 +36,14 @@ defmodule Etop.Reader do
   def handle_collect(state, stats) do
     Logger.debug(fn -> "handle_collect start" end)
 
-    # parse the util response and calculate load
-    {load, util} = calculate_load(stats.util, state.util, state.cores)
-
     stats =
-      %{stats | procs: parse_system_info(stats.procs)}
-      |> Map.put(:load, load)
-      |> Map.put(:util, util)
+      stats
+      |> calculate_load(state)
+      |> parse_system_info()
+      |> calculate_reductions(state)
+      |> get_processes(state)
 
-    {current, total} = calculate_reductions(stats.procs, state.prev)
-
-    list =
-      current
-      |> sort()
-      |> Enum.take(state.nprocs)
-
-    Logger.debug(fn -> "handle_collect done" end)
-    %{state | prev: stats.procs, util: util, total: total, stats: stats, list: list}
+    %{state | stats: stats}
   end
 
   @doc """
@@ -174,6 +165,12 @@ defmodule Etop.Reader do
   ###############
   # Private
 
+  defp calculate_load(%{util: curr} = stats, %{stats: %{util: prev}, cores: cores}) do
+    {load, util} = calculate_load(curr, prev, cores)
+
+    stats |> Map.put(:load, load) |> Map.put(:util, util)
+  end
+
   defp calculate_load({_, _} = curr, {_, _} = prev, cores) do
     curr = parse_util(curr)
     {CpuUtil.process_util(parse_util(prev), curr, cores: cores), curr}
@@ -187,18 +184,30 @@ defmodule Etop.Reader do
     {nil, nil}
   end
 
-  defp calculate_reductions(curr, prev) do
+  defp calculate_reductions(%{procs: curr} = stats, %{stats: %{procs: prev}}) do
     prev = if prev, do: prev, else: %{}
 
-    Enum.reduce(curr, {[], 0}, fn {pid, settings}, {acc, total} ->
-      with %{reductions: reds2} <- prev[pid] || @prev_default,
-           %{reductions: reds1} <- settings do
-        reds = reds1 - reds2
-        {[{pid, Map.put(settings, :reductions_diff, reds)} | acc], total + reds}
-      else
-        _ -> {acc, total}
-      end
-    end)
+    {process_list, total} =
+      Enum.reduce(curr, {[], 0}, fn {pid, settings}, {acc, total} ->
+        with %{reductions: reds2} <- prev[pid] || @prev_default,
+             %{reductions: reds1} <- settings do
+          reds = reds1 - reds2
+          {[{pid, Map.put(settings, :reductions_diff, reds)} | acc], total + reds}
+        else
+          _ -> {acc, total}
+        end
+      end)
+
+    {Map.put(stats, :total, total), process_list}
+  end
+
+  defp get_processes({stats, process_list}, state) do
+    processes =
+      process_list
+      |> sort()
+      |> Enum.take(state.nprocs)
+
+    Map.put(stats, :processes, processes)
   end
 
   def get_stats(pid),
@@ -234,8 +243,12 @@ defmodule Etop.Reader do
     List.to_integer(:os.getpid())
   end
 
-  defp parse_system_info(info) do
-    info
+  defp parse_system_info(%{procs: procs} = stats) do
+    %{stats | procs: parse_system_info(procs)}
+  end
+
+  defp parse_system_info(procs) do
+    procs
     |> Enum.map(fn {pid, item} ->
       {pid,
        item
