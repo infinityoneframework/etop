@@ -14,6 +14,8 @@ defmodule Etop.Reader do
     :status
   ]
 
+  alias Etop.Utils
+
   require Logger
 
   @doc """
@@ -143,25 +145,6 @@ defmodule Etop.Reader do
     send(self(), {:result, get_stats(state.os_pid)})
   end
 
-  @doc """
-  Configurable sort.
-
-  ## Arguments
-
-  * `list` - the enumerable to be sorted.
-  * `field` (:reductions_diff) - the field to be sorted on.
-  * `field_fn` (fn field -> &elem(&1, 1)[field] end) - function to get the field.
-  * `sorter_fn` (&>/2) -> Sort comparator (default descending)
-  """
-  def sort(
-        list,
-        field \\ :reductions_diff,
-        field_fn \\ fn field -> &elem(&1, 1)[field] end,
-        sorter_fn \\ &>/2
-      ) do
-    Enum.sort_by(list, field_fn.(field), sorter_fn)
-  end
-
   ###############
   # Private
 
@@ -204,7 +187,7 @@ defmodule Etop.Reader do
   defp get_processes({stats, process_list}, state) do
     processes =
       process_list
-      |> sort()
+      |> Utils.sort(state.sort, secondary: :reductions_diff)
       |> Enum.take(state.nprocs)
 
     Map.put(stats, :processes, processes)

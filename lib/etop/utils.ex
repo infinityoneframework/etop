@@ -120,6 +120,56 @@ defmodule Etop.Utils do
   def pad_t(item, len, char), do: item |> to_string() |> pad_t(len, char)
 
   @doc """
+  Configurable sort.
+
+  ## Arguments
+
+  * `list` - the enumerable to be sorted.
+  * `field` (:reductions_diff) - the field to be sorted on.
+  * `field_fn` (fn field -> &elem(&1, 1)[field] end) - function to get the field.
+  * `sorter_fn` (&>/2) -> Sort comparator (default descending)
+
+  ## Examples
+
+      iex> data = [one: %{a: 3, b: 2}, two: %{a: 1, b: 3}]
+      iex> Etop.Utils.sort(data, :b)
+      [two: %{a: 1, b: 3}, one: %{a: 3, b: 2}]
+
+      iex> data = [one: %{a: 3, b: 2}, two: %{a: 1, b: 3}]
+      iex> Etop.Utils.sort(data, :a, sorter: &<=/2)
+      [two: %{a: 1, b: 3}, one: %{a: 3, b: 2}]
+
+      iex> data = [%{a: 1, b: 2}, %{a: 2, b: 3}]
+      iex> Etop.Utils.sort(data, :a, mapper: & &1[:a])
+      [%{a: 2, b: 3}, %{a: 1, b: 2}]
+
+      iex> data = [x: %{a: 1, b: 1}, y: %{a: 1, b: 2}, z: %{a: 2, b: 0}]
+      iex> Etop.Utils.sort(data, :a, secondary: :b)
+      [z: %{a: 2, b: 0}, y: %{a: 1, b: 2}, x: %{a: 1, b: 1}]
+  """
+  def sort(list, field, opts \\ []) do
+    mapper = sort_mapper(field, opts[:mapper], opts[:secondary])
+    sorter = opts[:sorter] || (&>/2)
+    Enum.sort_by(list, mapper, sorter)
+  end
+
+  defp sort_mapper(field, nil, nil) do
+    &elem(&1, 1)[field]
+  end
+
+  defp sort_mapper(field, nil, field) do
+    sort_mapper(field, nil, nil)
+  end
+
+  defp sort_mapper(field, nil, secondary) do
+    &{elem(&1, 1)[field], elem(&1, 1)[secondary]}
+  end
+
+  defp sort_mapper(_, mapper, _) do
+    mapper
+  end
+
+  @doc """
   Get the server's timezone offset in seconds.
   """
   @spec timezone_offset() :: integer

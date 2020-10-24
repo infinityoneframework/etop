@@ -4,7 +4,7 @@ defmodule Etop.MixProject do
   def project do
     [
       app: :etop,
-      version: "0.5.0",
+      version: "0.5.1",
       elixir: "~> 1.7",
       start_permanent: Mix.env() == :prod,
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -14,6 +14,16 @@ defmodule Etop.MixProject do
       docs: [
         main: "Etop",
         extras: ["README.md", "LICENSE.md"]
+      ],
+      dialyzer: [
+        plt_add_deps: :app_tree
+      ],
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
       ],
       description: """
       A Unix top like functionality for Elixir Applications.
@@ -28,7 +38,7 @@ defmodule Etop.MixProject do
     ]
   end
 
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(:test), do: ["lib", "test/support", "test/fixtures"]
   defp elixirc_paths(_), do: ["lib"]
 
   # Run "mix help deps" to learn about dependencies.
@@ -36,7 +46,9 @@ defmodule Etop.MixProject do
     [
       {:cpu_util, "~> 0.5"},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
-      {:ex_doc, "~> 0.22.0", override: true, only: :dev, runtime: false}
+      {:ex_doc, "~> 0.22.0", override: true, only: :dev, runtime: false},
+      {:excoveralls, "~> 0.10", only: :test},
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false, override: true}
     ]
   end
 

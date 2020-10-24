@@ -72,6 +72,7 @@ defmodule Etop.ReaderTest do
 
   test "handle_connect/2", %{state: state} do
     stats = get_stats(state)
+
     state = Reader.handle_collect(state, stats)
 
     assert length(state.stats.processes) == 10

@@ -1,4 +1,6 @@
 defmodule Etop do
+  @sort_fields ~w(memory msgq reds reds_diff status default)a
+
   @moduledoc """
   A Top like implementation for Elixir Applications.
 
@@ -30,6 +32,14 @@ defmodule Etop do
 
       # Stop Etop, killing its GenServer
       ex> Etop.stop
+
+  ## Configuration
+
+  * `file` - Save the output to a file.
+  * `format` - the output file format. Values [:text, :exs]
+  * `interval (5000)` - the time (ms) between each run
+  * `nprocs (10)` - the number of processes to list
+  * `sort (reds_diff)` - the field to sort the process list. Values #{inspect(@sort_fields)}
   """
   use GenServer
 
@@ -38,7 +48,12 @@ defmodule Etop do
   require Logger
 
   @name __MODULE__
-  @valid_opts ~w(freq length debug file os_pid cores format interval nprocs)a
+  @valid_opts ~w(freq length debug file os_pid cores format interval nprocs sort)a
+
+  @sortable ~w(memory message_queue_len reductions reductions_diff status)a
+  @sort_field_mapper @sort_fields
+                     |> Enum.zip(@sortable)
+                     |> Keyword.put(:default, :reductions_diff)
 
   ###############
   # Public API
@@ -48,6 +63,13 @@ defmodule Etop do
   """
   def load do
     GenServer.call(@name, :load)
+  end
+
+  @doc """
+  Load the given .exs file.
+  """
+  def load(path) do
+    Etop.Report.load(path)
   end
 
   @doc """
@@ -101,9 +123,7 @@ defmodule Etop do
   # GenServer Callbacks
 
   def init(opts) do
-    send(self(), :initialize)
-
-    cpu_util? = Keyword.get(opts, :cpu_util, true)
+    send(self(), {:initialize, opts[:first_interval] || 1000})
 
     if node = opts[:node] do
       Node.connect(node)
@@ -112,7 +132,6 @@ defmodule Etop do
     {:ok,
      set_file(
        %{
-         cpu_util?: cpu_util?,
          cores: opts[:cores] || 1,
          debug: opts[:debug] || false,
          file: nil,
@@ -124,14 +143,15 @@ defmodule Etop do
          nprocs: opts[:nprocs] || opts[:length] || 10,
          os_pid: opts[:os_pid],
          stats: %{util: opts[:util], procs: nil, total: 0, load: nil},
-         timer_ref: nil
+         timer_ref: nil,
+         sort: @sort_field_mapper[Keyword.get(opts, :sort, :default)]
        },
        opts
      )}
   end
 
   def handle_call(:status, _, state) do
-    reply(state, Map.delete(state, :prev))
+    reply(state, %{state | stats: Map.delete(state.stats, :procs)})
   end
 
   def handle_call(:status!, _, state) do
@@ -140,7 +160,7 @@ defmodule Etop do
 
   def handle_call({:start, opts}, _, %{halted: true} = state) do
     %{set_opts(state, opts) | halted: false}
-    |> start_timer(1000)
+    |> start_timer(state.interval)
     |> reply(:ok)
   end
 
@@ -157,7 +177,7 @@ defmodule Etop do
   end
 
   def handle_call(:pause, _, %{halted: true} = state) do
-    reply(state, :not_halted)
+    reply(state, :already_halted)
   end
 
   def handle_call(:pause, _, state) do
@@ -181,11 +201,9 @@ defmodule Etop do
     noreply(%{state | cores: info.cores, os_pid: info.os_pid, stats: stats})
   end
 
-  def handle_info(:initialize, state) do
+  def handle_info({:initialize, delay}, state) do
     # Run the report in 1 second.
-    Process.send_after(self(), :collect, 1000)
-
-    if cpu_sup?(), do: :cpu_sup.start()
+    Process.send_after(self(), :collect, delay)
 
     Reader.remote_cpu_info(state)
 
@@ -229,7 +247,6 @@ defmodule Etop do
   def terminate(reason, state) do
     cancel_timer(state)
     Logger.debug(fn -> "terminate #{inspect(reason)}" end)
-    if cpu_sup?(), do: :cpu_sup.stop()
     :ok
   end
 
@@ -260,12 +277,6 @@ defmodule Etop do
     %{state | timer_ref: nil}
   end
 
-  defp cpu_sup? do
-    if Application.get_env(:etop, :etop_use_cpu_sup),
-      do: function_exported?(:cpu_sup, :start, 0),
-      else: false
-  end
-
   defp get_file_format(opts) do
     path = opts[:file]
 
@@ -292,12 +303,16 @@ defmodule Etop do
     if valid_opts?(opts) do
       opts
       |> Enum.reduce(state, fn {k, v}, state -> Map.put(state, k, v) end)
+      |> set_opts_sort(opts[:sort])
       |> maybe_set_file(opts)
     else
       Logger.info("Invalid opts")
       state
     end
   end
+
+  defp set_opts_sort(state, nil), do: Map.put(state, :sort, @sort_field_mapper[:default])
+  defp set_opts_sort(state, field), do: Map.put(state, :sort, @sort_field_mapper[field])
 
   defp start_timer(%{interval: interval} = state) do
     start_timer(state, interval)
@@ -328,8 +343,14 @@ defmodule Etop do
   end
 
   defp valid_opts?(opts) do
-    opts
-    |> Keyword.keys()
-    |> Enum.all?(&(&1 in @valid_opts))
+    keys? =
+      opts
+      |> Keyword.keys()
+      |> Enum.all?(&(&1 in @valid_opts))
+
+    keys? and valid_sort_option?(opts[:sort])
   end
+
+  defp valid_sort_option?(nil), do: true
+  defp valid_sort_option?(sort), do: sort in @sort_fields
 end
