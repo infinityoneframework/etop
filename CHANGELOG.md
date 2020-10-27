@@ -10,7 +10,7 @@
     * field to monitor
     * threshold
     * callback when that threshold is exceed twice in a row.
-
+* Toggle reporting feature
 
 ## 0.5.1 (2020-10-24)
 

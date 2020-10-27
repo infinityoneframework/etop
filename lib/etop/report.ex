@@ -128,6 +128,10 @@ defmodule Etop.Report do
   * save text format to file
   * save executable format to exs file
   """
+  def handle_report(%{reporting: false} = state) do
+    state
+  end
+
   def handle_report(state) do
     %{stats: %{processes: processes, total: total} = stats} = state
 

@@ -237,6 +237,8 @@ defmodule Etop.ReaderTest do
                state
                |> Etop.monitor(:process, :message_queue_len, 10, {__MODULE__, :monitor_callback})
                |> Reader.handle_collect(init_stats(state.stats, procs: procs2))
+
+               Process.sleep(10)
              end) == expected
     end
 
@@ -258,6 +260,8 @@ defmodule Etop.ReaderTest do
           state
           |> init_stats(procs: procs1)
           |> Reader.handle_collect(init_stats(state.stats, procs: procs2))
+
+          Process.sleep(5)
         end)
         |> String.split("\n", trim: true)
         |> Enum.reject(&(&1 =~ ~r/^\e/))

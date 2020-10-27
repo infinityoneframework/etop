@@ -48,7 +48,7 @@ defmodule Etop do
   require Logger
 
   @name __MODULE__
-  @valid_opts ~w(freq length debug file os_pid cores format interval nprocs sort monitors)a
+  @valid_opts ~w(freq length debug file os_pid cores format interval nprocs sort monitors reporting)a
 
   @sortable ~w(memory message_queue_len reductions reductions_diff status)a
   @sort_field_mapper @sort_fields
@@ -211,6 +211,32 @@ defmodule Etop do
   end
 
   @doc """
+  Enable or disable reporting.
+
+  Disabling reporting stops reporting printing or logging reports but keeps the Etop collecting
+  data. This option can be used with a monitor to toggle logging when a threshold is reached.
+
+  ## Examples
+
+      iex> Etop.start()
+      iex> Etop.reporting(false)
+      :ok
+
+      iex> Etop.start()
+      iex> enable_callback = fn _, _ -> Etop.reporting(true) end
+      iex> disable_callback = fn _, value ->
+      ...>   if value < 40.0, do: Etop.reporting(false)
+      ...> end
+      iex> Etop.monitor(:summary, [:load, :total], 50.0, enable_callback)
+      iex> Etop.add_monitor(:summary, [:load, :total], 40.0, disable_callback)
+      :ok
+  """
+  @spec reporting(boolean()) :: :ok | :already_reporting | :no_reporting
+  def reporting(enable?) do
+    GenServer.call(@name, {:reporting, enable?})
+  end
+
+  @doc """
   Set Etop settings
   """
   def set_opts(opts) do
@@ -277,7 +303,8 @@ defmodule Etop do
          os_pid: opts[:os_pid],
          stats: %{util: opts[:util], procs: nil, total: 0, load: nil},
          timer_ref: nil,
-         sort: @sort_field_mapper[Keyword.get(opts, :sort, :default)]
+         sort: @sort_field_mapper[Keyword.get(opts, :sort, :default)],
+         reporting: opts[:reporting] || true
        },
        opts
      )}
@@ -333,6 +360,19 @@ defmodule Etop do
 
   def handle_call(:pause, _, state) do
     reply(cancel_timer(%{state | halted: true}), :ok)
+  end
+
+  def handle_call({:reporting, value}, _, %{reporting: existing} = state)
+      when value != existing do
+    reply(%{state | reporting: value}, :ok)
+  end
+
+  def handle_call({:reporting, true}, _, state) do
+    reply(state, :already_reporting)
+  end
+
+  def handle_call({:reporting, false}, _, state) do
+    reply(state, :not_reporting)
   end
 
   def handle_cast({:add_monitor, monitor}, state) do

@@ -47,6 +47,15 @@ defmodule EtopTest do
       {:ok, _pid} = Etop.start()
       assert is_map(Etop.status())
     end
+
+    test "reporting/1" do
+      Etop.start()
+      Etop.pause()
+      assert Etop.reporting(false) == :ok
+      assert Etop.reporting(false) == :not_reporting
+      assert Etop.reporting(true) == :ok
+      assert Etop.reporting(true) == :already_reporting
+    end
   end
 
   describe "options" do

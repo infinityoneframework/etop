@@ -241,11 +241,11 @@ defmodule Etop.Reader do
   defp monitor_exceeds_threshold?(_, _, _), do: false
 
   defp run_monitor_callback(info, value, callback) when is_function(callback) do
-    callback.(info, value)
+    spawn(fn -> callback.(info, value) end)
   end
 
   defp run_monitor_callback(info, value, {mod, fun}) when is_atom(mod) and is_atom(fun) do
-    apply(mod, fun, [info, value])
+    spawn(fn -> apply(mod, fun, [info, value]) end)
   end
 
   defp get_processes({stats, process_list}, state) do
