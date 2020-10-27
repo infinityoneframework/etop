@@ -1,6 +1,25 @@
 # Etop Changelog
 
-## 0.5.0 (2020-10-24)
+
+## 0.5.2 (2020-10-26)
+
+### Features
+
+* Add monitor with callback feature
+  * Register a monitor with
+    * field to monitor
+    * threshold
+    * callback when that threshold is exceed twice in a row.
+
+
+## 0.5.1 (2020-10-24)
+
+### Features
+
+* Add sort option
+
+
+## 0.5.0 (2020-10-23)
 
 ### Bug fixes
 

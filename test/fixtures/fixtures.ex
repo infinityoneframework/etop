@@ -108,4 +108,230 @@ defmodule Etop.Fixtures do
       }
       # manual2: %{sys: 0.0, total: 0.0, user: 0.0}
     ]
+
+  def procs1,
+    do:
+      [
+        {pid('<0.0.0>'),
+         [
+           memory: {:memory, 26568},
+           registered_name: :init,
+           current_function: {:init, :boot_loop, 2},
+           initial_call: {:otp_ring0, :start, 2},
+           status: :waiting,
+           message_queue_len: 0,
+           links: [pid('<0.9.0>'), pid('<0.41.0>'), pid('<0.43.0>'), pid('<0.8.0>')],
+           dictionary: [],
+           trap_exit: true,
+           error_handler: :error_handler,
+           priority: :normal,
+           group_leader: pid('<0.0.0>'),
+           total_heap_size: 3196,
+           heap_size: 1598,
+           stack_size: 4,
+           reductions: 3380,
+           garbage_collection: [
+             max_heap_size: %{error_logger: true, kill: true, size: 0},
+             min_bin_vheap_size: 46422,
+             min_heap_size: 233,
+             fullsweep_after: 65535,
+             minor_gcs: 2
+           ],
+           suspending: []
+         ]},
+        {pid('<0.2.0>'),
+         [
+           memory: {:memory, 2688},
+           current_function: {:erts_literal_area_collector, :msg_loop, 4},
+           initial_call: {:erts_literal_area_collector, :start, 0},
+           status: :waiting,
+           message_queue_len: 12,
+           links: [],
+           dictionary: [],
+           trap_exit: true,
+           error_handler: :error_handler,
+           priority: :normal,
+           group_leader: pid('<0.0.0>'),
+           total_heap_size: 233,
+           heap_size: 233,
+           stack_size: 5,
+           reductions: 293_121,
+           garbage_collection: [
+             max_heap_size: %{error_logger: true, kill: true, size: 0},
+             min_bin_vheap_size: 46422,
+             min_heap_size: 233,
+             fullsweep_after: 65535,
+             minor_gcs: 0
+           ],
+           suspending: []
+         ]},
+        {pid('<0.6.0>'),
+         [
+           memory: {:memory, 2688},
+           current_function: {:prim_file, :helper_loop, 0},
+           initial_call: {:prim_file, :start, 0},
+           status: :waiting,
+           message_queue_len: 12,
+           links: [],
+           dictionary: [],
+           trap_exit: false,
+           error_handler: :error_handler,
+           priority: :normal,
+           group_leader: pid('<0.0.0>'),
+           total_heap_size: 233,
+           heap_size: 233,
+           stack_size: 1,
+           reductions: 194,
+           garbage_collection: [
+             max_heap_size: %{error_logger: true, kill: true, size: 0},
+             min_bin_vheap_size: 46422,
+             min_heap_size: 233,
+             fullsweep_after: 65535,
+             minor_gcs: 0
+           ],
+           suspending: []
+         ]},
+        {pid('<0.8.0>'),
+         [
+           memory: {:memory, 67888},
+           current_function: {Kernel.CLI, :exec_fun, 2},
+           initial_call: {:erlang, :apply, 2},
+           status: :waiting,
+           message_queue_len: 0,
+           links: [pid('<0.0.0>')],
+           dictionary: [],
+           trap_exit: true,
+           error_handler: :error_handler,
+           priority: :normal,
+           group_leader: pid('<0.62.0>'),
+           total_heap_size: 8370,
+           heap_size: 1598,
+           stack_size: 20,
+           reductions: 7038,
+           garbage_collection: [
+             max_heap_size: %{error_logger: true, kill: true, size: 0},
+             min_bin_vheap_size: 46422,
+             min_heap_size: 233,
+             fullsweep_after: 65535,
+             minor_gcs: 7
+           ],
+           suspending: []
+         ]}
+      ]
+      |> Enum.map(fn {k, v} -> {k, Enum.into(v, %{})} end)
+      |> Enum.into(%{})
+
+  def procs2,
+    do:
+      [
+        {pid('<0.0.0>'),
+         [
+           memory: {:memory, 26570},
+           registered_name: :init,
+           current_function: {:init, :boot_loop, 2},
+           initial_call: {:otp_ring0, :start, 2},
+           status: :waiting,
+           message_queue_len: 0,
+           links: [pid('<0.9.0>'), pid('<0.41.0>'), pid('<0.43.0>'), pid('<0.8.0>')],
+           dictionary: [],
+           trap_exit: true,
+           error_handler: :error_handler,
+           priority: :normal,
+           group_leader: pid('<0.0.0>'),
+           total_heap_size: 3196,
+           heap_size: 1598,
+           stack_size: 4,
+           reductions: 3388,
+           garbage_collection: [
+             max_heap_size: %{error_logger: true, kill: true, size: 0},
+             min_bin_vheap_size: 46422,
+             min_heap_size: 233,
+             fullsweep_after: 65535,
+             minor_gcs: 2
+           ],
+           suspending: []
+         ]},
+        {pid('<0.2.0>'),
+         [
+           memory: {:memory, 2688},
+           current_function: {:erts_literal_area_collector, :msg_loop, 4},
+           initial_call: {:erts_literal_area_collector, :start, 0},
+           status: :waiting,
+           message_queue_len: 5,
+           links: [],
+           dictionary: [],
+           trap_exit: true,
+           error_handler: :error_handler,
+           priority: :normal,
+           group_leader: pid('<0.0.0>'),
+           total_heap_size: 233,
+           heap_size: 233,
+           stack_size: 5,
+           reductions: 293_300,
+           garbage_collection: [
+             max_heap_size: %{error_logger: true, kill: true, size: 0},
+             min_bin_vheap_size: 46422,
+             min_heap_size: 233,
+             fullsweep_after: 65535,
+             minor_gcs: 0
+           ],
+           suspending: []
+         ]},
+        {pid('<0.6.0>'),
+         [
+           memory: {:memory, 2688},
+           current_function: {:prim_file, :helper_loop, 0},
+           initial_call: {:prim_file, :start, 0},
+           status: :waiting,
+           message_queue_len: 15,
+           links: [],
+           dictionary: [],
+           trap_exit: false,
+           error_handler: :error_handler,
+           priority: :normal,
+           group_leader: pid('<0.0.0>'),
+           total_heap_size: 233,
+           heap_size: 233,
+           stack_size: 1,
+           reductions: 500,
+           garbage_collection: [
+             max_heap_size: %{error_logger: true, kill: true, size: 0},
+             min_bin_vheap_size: 46422,
+             min_heap_size: 233,
+             fullsweep_after: 65535,
+             minor_gcs: 0
+           ],
+           suspending: []
+         ]},
+        {pid('<0.8.0>'),
+         [
+           memory: {:memory, 67888},
+           current_function: {Kernel.CLI, :exec_fun, 2},
+           initial_call: {:erlang, :apply, 2},
+           status: :waiting,
+           message_queue_len: 0,
+           links: [pid('<0.0.0>')],
+           dictionary: [],
+           trap_exit: true,
+           error_handler: :error_handler,
+           priority: :normal,
+           group_leader: pid('<0.62.0>'),
+           total_heap_size: 8370,
+           heap_size: 1598,
+           stack_size: 20,
+           reductions: 7038,
+           garbage_collection: [
+             max_heap_size: %{error_logger: true, kill: true, size: 0},
+             min_bin_vheap_size: 46422,
+             min_heap_size: 233,
+             fullsweep_after: 65535,
+             minor_gcs: 7
+           ],
+           suspending: []
+         ]}
+      ]
+      |> Enum.map(fn {k, v} -> {k, Enum.into(v, %{})} end)
+      |> Enum.into(%{})
+
+  defp pid(pid), do: :erlang.list_to_pid(pid)
 end

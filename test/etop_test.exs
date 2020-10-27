@@ -8,6 +8,7 @@ defmodule EtopTest do
   setup do
     on_exit(fn ->
       Etop.stop()
+      Process.sleep(20)
     end)
 
     :ok
@@ -32,6 +33,20 @@ defmodule EtopTest do
     Process.sleep(20)
 
     :ok
+  end
+
+  describe "basic" do
+    test "Starts" do
+      {:ok, pid} = Etop.start()
+      assert is_pid(pid)
+      Etop.stop()
+      Process.sleep(100)
+    end
+
+    test "Status" do
+      {:ok, _pid} = Etop.start()
+      assert is_map(Etop.status())
+    end
   end
 
   describe "options" do
@@ -75,8 +90,51 @@ defmodule EtopTest do
       Etop.pause()
       assert Etop.status().debug
 
-      Etop.start(debug: false)
+      Etop.continue(debug: false)
       refute Etop.status().debug
+    end
+
+    test "monitor/4" do
+      callback = &{&1, &2}
+      Etop.monitor(:process, :reductions, 10_000, callback)
+      assert Etop.status().monitors == [{:process, :reductions, 10_000, callback}]
+    end
+
+    test "add_monitor/4" do
+      callback = &{&1, &2}
+      callback1 = &IO.inspect({&1, &2})
+      Etop.monitor(:process, :reductions, 10_000, callback)
+      Etop.add_monitor(:summary, [:load, :user], 50.0, callback1)
+
+      assert Etop.status().monitors == [
+               {:summary, [:load, :user], 50.0, callback1},
+               {:process, :reductions, 10_000, callback}
+             ]
+    end
+
+    test "remove_monitor/3" do
+      callback = &{&1, &2}
+      callback1 = &IO.inspect({&1, &2})
+      Etop.monitor(:process, :reductions, 10_000, callback)
+      Etop.add_monitor(:summary, [:load, :user], 50.0, callback1)
+      Etop.remove_monitor(:summary, [:load, :user], 50.0)
+
+      assert Etop.status().monitors == [
+               {:process, :reductions, 10_000, callback}
+             ]
+    end
+
+    test "monitor clear" do
+      callback = &{&1, &2}
+      Etop.monitor(:process, :reductions, 10_000, callback)
+      Etop.remove_monitors()
+      assert Etop.monitors() == []
+    end
+
+    test "set_opts monitors" do
+      callback = &{&1, &2}
+      Etop.set_opts(monitors: [{:summary, [:load, :total], 10.0, callback}])
+      assert Etop.monitors() == [{:summary, [:load, :total], 10.0, callback}]
     end
   end
 
@@ -116,26 +174,31 @@ defmodule EtopTest do
       assert summary.node == "nonode@nohost"
     end
 
-    test "pause and restart" do
+    test "pause and continue" do
       Etop.pause()
       assert Etop.status().interval == 100
-      Etop.start()
+      Etop.continue()
       Process.sleep(110)
       Etop.pause()
 
       data = Etop.load()
-      assert length(data) == 2
+      assert length(data) >= 2
+    end
+
+    test "continue when not halted" do
+      assert Etop.continue() == :not_halted
     end
 
     test "start when started" do
-      assert Etop.start() == :not_halted
+      pid = Process.whereis(Etop)
+      assert Etop.start() == {:error, {:already_started, pid}}
     end
 
     test "ignores collect when halted" do
       Etop.pause()
       send(Etop, :collect)
       Process.sleep(110)
-      assert Etop.load() |> length() == 1
+      assert (Etop.load() |> length()) in [1, 2]
     end
 
     test "invalid event" do

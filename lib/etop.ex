@@ -48,15 +48,70 @@ defmodule Etop do
   require Logger
 
   @name __MODULE__
-  @valid_opts ~w(freq length debug file os_pid cores format interval nprocs sort)a
+  @valid_opts ~w(freq length debug file os_pid cores format interval nprocs sort monitors)a
 
   @sortable ~w(memory message_queue_len reductions reductions_diff status)a
   @sort_field_mapper @sort_fields
                      |> Enum.zip(@sortable)
                      |> Keyword.put(:default, :reductions_diff)
 
+  @type monitor_callback :: (any(), any() -> none()) | {atom(), atom()}
+  @type monitor_type :: :process | :summary
+  @type monitor_fields :: atom() | [atom()]
+  @type monitor :: {monitor_type(), monitor_fields(), any(), monitor_callback()}
+  @type monitors :: [monitor()]
+
   ###############
   # Public API
+
+  @doc """
+  Add a new monitor.
+
+  Adds the given monitor to any existing monitors.
+
+  ## Examples
+
+      iex> Etop.start()
+      iex> callback = &{&1, &2}
+      iex> Etop.monitor(:summary, [:load, :sys], 10.0, callback)
+      iex> Etop.add_monitor(:process, :reductions, 1000, callback)
+      iex> Etop.monitors() ==
+      ...> [
+      ...>   {:process, :reductions, 1000, callback},
+      ...>   {:summary, [:load, :sys], 10.0, callback}
+      ...> ]
+      true
+  """
+  @spec add_monitor(monitor_type(), monitor_fields(), any(), monitor_callback()) ::
+          no_return()
+  def add_monitor(type, field, threshold, callback) do
+    GenServer.cast(@name, {:add_monitor, {type, field, threshold, callback}})
+  end
+
+  @doc """
+  Add a new monitor to an Etop state map.
+  """
+  @spec add_monitor(
+          %{:monitors => monitors()},
+          monitor_type(),
+          monitor_fields(),
+          any(),
+          monitor_callback()
+        ) :: %{:monitors => monitors()}
+  def add_monitor(state, type, field, threshold, callback) do
+    %{state | monitors: [{type, field, threshold, callback} | state.monitors]}
+  end
+
+  @doc """
+  Restart Etop if its halted.
+  """
+  def continue(opts \\ []) do
+    if Process.whereis(@name) do
+      GenServer.call(@name, {:continue, opts})
+    else
+      {:error, :no_process}
+    end
+  end
 
   @doc """
   Load the current exs log file.
@@ -73,10 +128,86 @@ defmodule Etop do
   end
 
   @doc """
+  Set a monitor.
+
+  Replaces any existing monitors with the given monitor.
+
+  ## Examples
+
+      iex> Etop.start()
+      iex> callback = &{&1, &2}
+      iex> Etop.monitor(:summary, [:load, :sys], 10.0, callback)
+      iex> Etop.monitors() == [{:summary, [:load, :sys], 10.0, callback}]
+      true
+  """
+  @spec monitor(monitor_type(), monitor_fields(), any(), monitor_callback()) :: no_return()
+  def monitor(type, field, threshold, callback) do
+    GenServer.cast(@name, {:monitor, {type, field, threshold, callback}})
+  end
+
+  @spec monitor(
+          %{:monitors => monitors()},
+          monitor_type(),
+          monitor_fields(),
+          any(),
+          monitor_callback()
+        ) :: %{:monitors => monitors()}
+  def monitor(state, type, field, threshold, callback) do
+    set_opts(state, monitors: [{type, field, threshold, callback}])
+  end
+
+  @doc """
+  Get the current monitors.
+
+  ## Examples
+
+      iex> Etop.start()
+      iex> callback = &{&1, &2}
+      iex> Etop.monitor(:summary, [:load, :sys], 10.0, callback)
+      iex> Etop.monitors() == [{:summary, [:load, :sys], 10.0, callback}]
+      true
+  """
+  @spec monitors() :: [tuple()]
+  def monitors do
+    GenServer.call(@name, :monitors)
+  end
+
+  @doc """
   Pause a running Etop session.
   """
   def pause do
     GenServer.call(@name, :pause)
+  end
+
+  @doc """
+  Remove all monitors.
+
+  ## Examples
+
+      iex> Etop.start()
+      iex> Etop.monitor(:summary, [:load, :total], 10.0, &IO.inspect({&1, &2}))
+      iex> Etop.remove_monitors()
+      iex> Etop.monitors()
+      []
+  """
+  def remove_monitors do
+    GenServer.cast(@name, :remove_monitors)
+  end
+
+  @doc """
+  Remove a monitor.
+
+  ## Examples
+
+      iex> Etop.start()
+      iex> Etop.monitor(:summary, [:load, :total], 10.0, &IO.inspect({&1, &2}))
+      iex> response = Etop.remove_monitor(:summary, [:load, :total], 10.0)
+      iex> {response, Etop.monitors()}
+      {:ok, []}
+  """
+  @spec remove_monitor(monitor_type(), monitor_fields(), any()) :: :ok | :not_found
+  def remove_monitor(type, field, threshold) do
+    GenServer.call(@name, {:remove_monitor, {type, field, threshold}})
   end
 
   @doc """
@@ -94,11 +225,7 @@ defmodule Etop do
   Start Etop Reporting.
   """
   def start(opts \\ []) do
-    if Process.whereis(@name) do
-      GenServer.call(@name, {:start, opts})
-    else
-      GenServer.start(__MODULE__, opts, name: @name)
-    end
+    GenServer.start(__MODULE__, opts, name: @name)
   end
 
   @doc """
@@ -129,6 +256,11 @@ defmodule Etop do
       Node.connect(node)
     end
 
+    monitors =
+      if monitors = opts[:monitors] || Application.get_env(:etop, :monitor),
+        do: List.flatten([monitors]),
+        else: []
+
     {:ok,
      set_file(
        %{
@@ -139,6 +271,7 @@ defmodule Etop do
          halted: Keyword.get(opts, :halted, false),
          info_map: nil,
          interval: opts[:interval] || opts[:freq] || 5000,
+         monitors: validate_monitors!(monitors),
          node: opts[:node],
          nprocs: opts[:nprocs] || opts[:length] || 10,
          os_pid: opts[:os_pid],
@@ -150,6 +283,20 @@ defmodule Etop do
      )}
   end
 
+  def handle_call({:remove_monitor, {which, fields, threshold}}, _, state) do
+    monitors =
+      Enum.reject(state.monitors, fn
+        {^which, ^fields, ^threshold, _} -> true
+        _ -> false
+      end)
+
+    if state.monitors == monitors do
+      reply(state, :not_found)
+    else
+      reply(%{state | monitors: monitors}, :ok)
+    end
+  end
+
   def handle_call(:status, _, state) do
     reply(state, %{state | stats: Map.delete(state.stats, :procs)})
   end
@@ -158,13 +305,13 @@ defmodule Etop do
     reply(state, state)
   end
 
-  def handle_call({:start, opts}, _, %{halted: true} = state) do
+  def handle_call({:continue, opts}, _, %{halted: true} = state) do
     %{set_opts(state, opts) | halted: false}
     |> start_timer(state.interval)
     |> reply(:ok)
   end
 
-  def handle_call({:start, _}, _, state) do
+  def handle_call({:continue, _}, _, state) do
     reply(state, :not_halted)
   end
 
@@ -176,12 +323,30 @@ defmodule Etop do
     reply(state, {:error, :invalid_file})
   end
 
+  def handle_call(:monitors, _, state) do
+    reply(state, state.monitors)
+  end
+
   def handle_call(:pause, _, %{halted: true} = state) do
     reply(state, :already_halted)
   end
 
   def handle_call(:pause, _, state) do
     reply(cancel_timer(%{state | halted: true}), :ok)
+  end
+
+  def handle_cast({:add_monitor, monitor}, state) do
+    monitors = state.monitors || []
+    noreply(%{state | monitors: [monitor | monitors]})
+  end
+
+  def handle_cast({:monitor, monitor}, state) do
+    state = if valid_monitor?(monitor), do: %{state | monitors: [monitor]}, else: state
+    noreply(state)
+  end
+
+  def handle_cast(:remove_monitors, state) do
+    noreply(%{state | monitors: []})
   end
 
   def handle_cast({:set_opts, opts}, state) do
@@ -342,13 +507,36 @@ defmodule Etop do
     Map.put(info, field, default)
   end
 
+  defp valid_monitor?({which, field, threshold, callback}) do
+    which in ~w(process summary)a and (is_atom(field) or is_list(field)) and is_number(threshold) and
+      (is_nil(callback) or is_function(callback, 2) or is_tuple(callback))
+  end
+
+  defp valid_monitor?(nil), do: true
+
+  defp valid_monitor?(_), do: false
+
+  defp valid_monitors?([]), do: true
+
+  defp valid_monitors?(list) when is_list(list), do: Enum.all?(list, &valid_monitor?/1)
+
+  defp valid_monitors?(monitor), do: valid_monitor?(monitor)
+
+  defp validate_monitors!(monitors) do
+    unless valid_monitors?(monitors) do
+      raise "Invalid monitor #{inspect(monitors)}"
+    end
+
+    monitors
+  end
+
   defp valid_opts?(opts) do
     keys? =
       opts
       |> Keyword.keys()
       |> Enum.all?(&(&1 in @valid_opts))
 
-    keys? and valid_sort_option?(opts[:sort])
+    keys? and valid_sort_option?(opts[:sort]) and valid_monitors?(opts[:monitors])
   end
 
   defp valid_sort_option?(nil), do: true

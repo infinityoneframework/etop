@@ -1,5 +1,5 @@
 defmodule Etop.UtilsTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
 
   doctest Etop.Utils
 end
