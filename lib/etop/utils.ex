@@ -201,14 +201,14 @@ defmodule Etop.Utils do
 
   ## Examples
 
-    iex> Etop.Utils.size_string_b(100.123)
-    "100.12B"
+      iex> Etop.Utils.size_string_b(100.123)
+      "100.12B"
 
-    iex> Etop.Utils.size_string_b(10.5, 0)
-    "11B"
+      iex> Etop.Utils.size_string_b(10.5, 0)
+      "11B"
 
-    iex> Etop.Utils.size_string_b(1500)
-    "1.46KB"
+      iex> Etop.Utils.size_string_b(1500)
+      "1.46KB"
   """
   @spec size_string_b(number(), integer()) :: String.t()
   def size_string_b(size, rnd \\ 2)
