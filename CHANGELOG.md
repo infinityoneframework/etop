@@ -1,5 +1,16 @@
 # Etop Changelog
 
+## 0.5.3 (2020-10-29)
+
+### Features
+
+* Add Humanize option (default true)
+
+### Bug fixes
+
+* Fix sort option
+* Fix sorting when printing from exs log
+* Fix tests that break when run on systems with different core counts.
 
 ## 0.5.2 (2020-10-26)
 
