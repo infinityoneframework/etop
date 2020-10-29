@@ -48,7 +48,7 @@ defmodule Etop do
   require Logger
 
   @name __MODULE__
-  @valid_opts ~w(freq length debug file os_pid cores format interval nprocs sort monitors reporting)a
+  @valid_opts ~w(freq length debug file os_pid cores format interval nprocs sort monitors reporting human)a
 
   @sortable ~w(memory message_queue_len reductions reductions_diff status)a
   @sort_field_mapper @sort_fields
@@ -304,7 +304,8 @@ defmodule Etop do
          stats: %{util: opts[:util], procs: nil, total: 0, load: nil},
          timer_ref: nil,
          sort: @sort_field_mapper[Keyword.get(opts, :sort, :default)],
-         reporting: opts[:reporting] || true
+         reporting: opts[:reporting] || true,
+         human: Keyword.get(opts, :human, true)
        },
        opts
      )}

@@ -74,8 +74,8 @@ defmodule Etop.Report do
     state: :waiting
   }
 
-  @sortable ~w(memory msg_q reductions reds_diff state fun name percent pid)a
-  @sort_fields ~w(memory msgq reds reds_diff state fun name percent pid)a
+  @sortable ~w(memory msg_q reductions reds_diff state fun name percent pid reds_diff)a
+  @sort_fields ~w(memory msgq reds reds_diff state fun name percent pid reductions_diff)a
   @sort_field_mapper @sort_fields |> Enum.zip(@sortable)
 
   @exs_template """
@@ -268,15 +268,18 @@ defmodule Etop.Report do
 
   See `Etop.Report.print/3` for more details.
   """
-  def print(entry), do: print(entry, nil, [])
+  def print(entry), do: print(entry, nil, %{human: true})
 
   @doc """
   Print a report with defaults.
 
   See `Etop.Report.print/3` for more details.
   """
-  def print(entry, file) when is_binary(file) or is_nil(file), do: print(entry, file, [])
-  def print(entry, opts) when is_list(opts), do: print(entry, nil, opts)
+  def print(entry, %{file: file} = state) when is_binary(file) or is_nil(file),
+    do: print(entry, file, state)
+
+  def print(entry, opts) when is_list(opts),
+    do: print(entry, nil, opts)
 
   @doc """
   Print a report.
@@ -291,6 +294,7 @@ defmodule Etop.Report do
     if !opts[:sort] || !!@sort_field_mapper[opts[:sort]] do
       Enum.each(entries, &print(&1, file, opts))
     else
+      Logger.warn("invalid sort options")
       {:error, :invalid_sort_option}
     end
   end
@@ -299,7 +303,7 @@ defmodule Etop.Report do
     if !opts[:sort] || !!@sort_field_mapper[opts[:sort]] do
       []
       |> puts(@separator)
-      |> print_summary(entry)
+      |> print_summary(entry, opts)
       |> puts("")
       |> puts(@header_str)
       |> puts(@separator_dash)
@@ -415,6 +419,14 @@ defmodule Etop.Report do
     |> String.slice(0, l2)
   end
 
+  defp humanize(number, true) do
+    Utils.size_string_b(number, 0)
+  end
+
+  defp humanize(number, _) do
+    to_string(number)
+  end
+
   defp print_processes(report, entry, opts) do
     [l1, l2, l3, l4, l5, l6, l7, _l8] = @cols
 
@@ -430,7 +442,7 @@ defmodule Etop.Report do
               pad(p.name, l2),
               pad(p.percent, l3),
               pad(p.reds_diff, l4),
-              pad(p.memory, l5),
+              p.memory |> humanize(opts[:human]) |> pad(l5),
               pad(p.msg_q, l6),
               pad(p.state, l7),
               p.fun
@@ -449,9 +461,10 @@ defmodule Etop.Report do
     |> puts("")
   end
 
-  defp print_summary(report, %{summary: summary}) do
+  defp print_summary(report, %{summary: summary}, opts) do
     load = summary.load
     memory = summary.memory
+    h = opts[:human]
 
     node = summary.node
     node_len = String.length(node)
@@ -462,25 +475,25 @@ defmodule Etop.Report do
       "Load:  cpu  ",
       to_string(load.cpu) <> "%",
       "Memory:  total    ",
-      memory.total,
+      humanize(memory.total, h),
       "     binary",
-      memory.binary
+      humanize(memory.binary, h)
     )
     |> summary_line(
       "       procs",
       load.nprocs,
       "processes",
-      memory.processes,
+      humanize(memory.processes, h),
       "     code",
-      memory.code
+      humanize(memory.code, h)
     )
     |> summary_line(
       "       runq ",
       load.runq,
       "atom    ",
-      memory.atom,
+      humanize(memory.atom, h),
       "      ets",
-      memory.ets
+      humanize(memory.ets, h)
     )
   end
 
@@ -491,8 +504,8 @@ defmodule Etop.Report do
   defp save_or_print(report, %{format: :exs, file: path}) when is_binary(path),
     do: save_exs_report(report, path)
 
-  defp save_or_print(report, %{file: path}),
-    do: print(report, path)
+  defp save_or_print(report, state),
+    do: print(report, state)
 
   defp sort_by_load(entries, sorter \\ &>/2) do
     Enum.sort_by(entries, &get_in(&1, [:summary, :load, :cpu]), sorter)
@@ -502,7 +515,7 @@ defmodule Etop.Report do
 
   defp sort_processes(list, field) do
     field = @sort_field_mapper[field]
-    Utils.sort(list, field, secondary: :reds_diff, mapper: & &1[field])
+    Utils.sort(list, field, secondary: :reds_diff, mapper: & &1)
   end
 
   defp summary_line(report, load_label, load, mem1_label, mem1, mem2_label, mem2) do

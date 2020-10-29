@@ -2,9 +2,14 @@ defmodule Etop.Utils do
   @moduledoc """
   Utility helpers for Etop.
   """
+  @kb 1024
+  @mb @kb * @kb
+  @gb @mb * @kb
+  @tb @gb * @kb
+  @pb @tb * @kb
 
   @doc """
-  Center the given string in the given length.
+  Center a string in the given length.
 
   Return a string of length >= the given length with the given string centered.
 
@@ -17,6 +22,9 @@ defmodule Etop.Utils do
 
       iex> Etop.Utils.center('Test', 7, "-")
       "-Test--"
+
+      iex> Etop.Utils.center("test", 2)
+      "test"
   """
   @spec center(any(), integer(), String.t()) :: String.t()
   def center(item, len, char \\ " ")
@@ -143,9 +151,13 @@ defmodule Etop.Utils do
       iex> Etop.Utils.sort(data, :a, mapper: & &1[:a])
       [%{a: 2, b: 3}, %{a: 1, b: 2}]
 
-      iex> data = [x: %{a: 1, b: 1}, y: %{a: 1, b: 2}, z: %{a: 2, b: 0}]
+      iex> data = [x: %{a: 1, b: 1}, z: %{a: 2, b: 0}, y: %{a: 1, b: 2}]
       iex> Etop.Utils.sort(data, :a, secondary: :b)
       [z: %{a: 2, b: 0}, y: %{a: 1, b: 2}, x: %{a: 1, b: 1}]
+
+      iex> data = [w: %{a: 1, b: 3}, x: %{a: 1, b: 1}, z: %{a: 2, b: 0}, y: %{a: 1, b: 2}]
+      iex> data |> Etop.Utils.sort(:a, secondary: :b, mapper: &elem(&1, 1)) |> Keyword.keys()
+      [:z, :w, :y, :x]
   """
   def sort(list, field, opts \\ []) do
     mapper = sort_mapper(field, opts[:mapper], opts[:secondary])
@@ -165,8 +177,15 @@ defmodule Etop.Utils do
     &{elem(&1, 1)[field], elem(&1, 1)[secondary]}
   end
 
-  defp sort_mapper(_, mapper, _) do
+  defp sort_mapper(_, mapper, nil) do
     mapper
+  end
+
+  defp sort_mapper(field, mapper, secondary) do
+    fn x ->
+      item = mapper.(x)
+      {item[field], item[secondary]}
+    end
   end
 
   @doc """
@@ -176,4 +195,105 @@ defmodule Etop.Utils do
   def timezone_offset do
     NaiveDateTime.diff(NaiveDateTime.from_erl!(:calendar.local_time()), NaiveDateTime.utc_now())
   end
+
+  @doc """
+  Scale a number into xb unit with label.
+
+  ## Examples
+
+    iex> Etop.Utils.size_string_b(100.123)
+    "100.12B"
+
+    iex> Etop.Utils.size_string_b(10.5, 0)
+    "11B"
+
+    iex> Etop.Utils.size_string_b(1500)
+    "1.46KB"
+  """
+  @spec size_string_b(number(), integer()) :: String.t()
+  def size_string_b(size, rnd \\ 2)
+
+  def size_string_b(size, rnd) when size < @kb,
+    do: float_to_string(size, rnd) <> "B"
+
+  def size_string_b(size, rnd),
+    do: size_string_kb(size / @kb, rnd)
+
+  @doc """
+  Scale a number into xb unit with label.
+
+  ## Examples
+
+      iex> Etop.Utils.size_string_kb(0.253)
+      "0.25KB"
+
+      iex> Etop.Utils.size_string_kb(0.253, 1)
+      "0.3KB"
+
+      iex> Etop.Utils.size_string_kb(1500)
+      "1.46MB"
+
+      iex> Etop.Utils.size_string_kb(1024 * 1024 * 3)
+      "3.0GB"
+
+      iex> Etop.Utils.size_string_kb(1024 * 1024 * 1024 * 2.5)
+      "2.5TB"
+
+      iex> Etop.Utils.size_string_kb(1024 * 1024 * 1024 * 1024 * 1.5, 0)
+      "2PB"
+
+      iex> Etop.Utils.size_string_kb(1024 * 1024 * 1024 * 1024 * 1024, 0)
+      "1EB"
+  """
+  @spec size_string_kb(number(), integer()) :: String.t()
+  def size_string_kb(size, rnd \\ 2)
+
+  def size_string_kb(size, rnd) when size < @kb do
+    float_to_string(size, rnd) <> "KB"
+  end
+
+  def size_string_kb(size, rnd) when size < @mb do
+    float_to_string(size / @kb, rnd) <> "MB"
+  end
+
+  def size_string_kb(size, rnd) when size < @gb do
+    float_to_string(size / @mb, rnd) <> "GB"
+  end
+
+  def size_string_kb(size, rnd) when size < @tb do
+    float_to_string(size / @gb, rnd) <> "TB"
+  end
+
+  def size_string_kb(size, rnd) when size < @pb do
+    float_to_string(size / @tb, rnd) <> "PB"
+  end
+
+  def size_string_kb(size, rnd) do
+    float_to_string(size / @pb, rnd) <> "EB"
+  end
+
+  @doc """
+  Round a number and convert to a string.
+
+      iex> Etop.Utils.float_to_string(1.125, 2)
+      "1.13"
+
+      iex> Etop.Utils.float_to_string(1.125, 1)
+      "1.1"
+
+      iex> Etop.Utils.float_to_string(1.5, 0)
+      "2"
+
+      iex> Etop.Utils.float_to_string(100, 0)
+      "100"
+  """
+  @spec float_to_string(number(), integer()) :: String.t()
+  def float_to_string(size, 0) when is_float(size),
+    do: size |> round() |> to_string()
+
+  def float_to_string(size, rnd) when is_float(size),
+    do: size |> Float.round(rnd) |> to_string()
+
+  def float_to_string(size, _rnd),
+    do: to_string(size)
 end
