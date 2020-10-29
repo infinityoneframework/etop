@@ -1,5 +1,11 @@
 # Etop Changelog
 
+## 0.5.4 (2020-10-29)
+
+### Bug fixes
+
+* Fix msgq sort option
+
 ## 0.5.3 (2020-10-29)
 
 ### Features

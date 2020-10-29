@@ -74,8 +74,8 @@ defmodule Etop.Report do
     state: :waiting
   }
 
-  @sortable ~w(memory msg_q reductions reds_diff state fun name percent pid reds_diff)a
-  @sort_fields ~w(memory msgq reds reds_diff state fun name percent pid reductions_diff)a
+  @sortable ~w(memory msg_q reductions reds_diff state fun name percent pid reds_diff msg_q)a
+  @sort_fields ~w(memory msgq reds reds_diff state fun name percent pid reductions_diff message_queue_len)a
   @sort_field_mapper @sort_fields |> Enum.zip(@sortable)
 
   @exs_template """
