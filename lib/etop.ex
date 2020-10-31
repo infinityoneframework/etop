@@ -72,7 +72,7 @@ defmodule Etop do
   ## Examples
 
       iex> Etop.start()
-      iex> callback = &{&1, &2}
+      iex> callback = &{&1, &2, &3}
       iex> Etop.monitor(:summary, [:load, :sys], 10.0, callback)
       iex> Etop.add_monitor(:process, :reductions, 1000, callback)
       iex> Etop.monitors() ==
@@ -135,7 +135,7 @@ defmodule Etop do
   ## Examples
 
       iex> Etop.start()
-      iex> callback = &{&1, &2}
+      iex> callback = &{&1, &2, &3}
       iex> Etop.monitor(:summary, [:load, :sys], 10.0, callback)
       iex> Etop.monitors() == [{:summary, [:load, :sys], 10.0, callback}]
       true
@@ -162,7 +162,7 @@ defmodule Etop do
   ## Examples
 
       iex> Etop.start()
-      iex> callback = &{&1, &2}
+      iex> callback = &{&1, &2, &3}
       iex> Etop.monitor(:summary, [:load, :sys], 10.0, callback)
       iex> Etop.monitors() == [{:summary, [:load, :sys], 10.0, callback}]
       true
@@ -185,7 +185,7 @@ defmodule Etop do
   ## Examples
 
       iex> Etop.start()
-      iex> Etop.monitor(:summary, [:load, :total], 10.0, &IO.inspect({&1, &2}))
+      iex> Etop.monitor(:summary, [:load, :total], 10.0, &IO.inspect({&1, &2, &3}))
       iex> Etop.remove_monitors()
       iex> Etop.monitors()
       []
@@ -200,7 +200,7 @@ defmodule Etop do
   ## Examples
 
       iex> Etop.start()
-      iex> Etop.monitor(:summary, [:load, :total], 10.0, &IO.inspect({&1, &2}))
+      iex> Etop.monitor(:summary, [:load, :total], 10.0, &IO.inspect({&1, &2, &3}))
       iex> response = Etop.remove_monitor(:summary, [:load, :total], 10.0)
       iex> {response, Etop.monitors()}
       {:ok, []}
@@ -223,9 +223,9 @@ defmodule Etop do
       :ok
 
       iex> Etop.start()
-      iex> enable_callback = fn _, _ -> Etop.reporting(true) end
-      iex> disable_callback = fn _, value ->
-      ...>   if value < 40.0, do: Etop.reporting(false)
+      iex> enable_callback = fn _, _, state -> %{state | reporting: true} end
+      iex> disable_callback = fn _, value, state ->
+      ...>   if value < 40.0, do: %{state | reporting: false}
       ...> end
       iex> Etop.monitor(:summary, [:load, :total], 50.0, enable_callback)
       iex> Etop.add_monitor(:summary, [:load, :total], 40.0, disable_callback)
@@ -304,7 +304,7 @@ defmodule Etop do
          stats: %{util: opts[:util], procs: nil, total: 0, load: nil},
          timer_ref: nil,
          sort: @sort_field_mapper[Keyword.get(opts, :sort, :default)],
-         reporting: opts[:reporting] || true,
+         reporting: Keyword.get(opts, :reporting, true),
          human: Keyword.get(opts, :human, true)
        },
        opts
@@ -528,11 +528,11 @@ defmodule Etop do
     %{state | timer_ref: Process.send_after(self(), :collect, interval)}
   end
 
-  defp reply(%{} = state, reply), do: {:reply, reply, state}
-  defp reply(state, _), do: raise("invalid state: #{inspect(state)}")
+  def reply(%{} = state, reply), do: {:reply, reply, state}
+  def reply(state, _), do: raise("invalid state: #{inspect(state)}")
 
-  defp noreply(%{} = state), do: {:noreply, state}
-  defp noreply(state), do: raise("invalid state: #{inspect(state)}")
+  def noreply(%{} = state), do: {:noreply, state}
+  def noreply(state), do: raise("invalid state: #{inspect(state)}")
 
   defp sanitize_info_result(info, field, default \\ nil)
 
@@ -550,7 +550,7 @@ defmodule Etop do
 
   defp valid_monitor?({which, field, threshold, callback}) do
     which in ~w(process summary)a and (is_atom(field) or is_list(field)) and is_number(threshold) and
-      (is_nil(callback) or is_function(callback, 2) or is_tuple(callback))
+      (is_nil(callback) or is_function(callback, 3) or is_tuple(callback))
   end
 
   defp valid_monitor?(nil), do: true

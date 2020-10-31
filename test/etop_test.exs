@@ -1,5 +1,8 @@
 defmodule EtopTest do
   use ExUnit.Case
+
+  import ExUnit.CaptureLog
+
   doctest Etop
 
   @tmp_path "test/tmp"
@@ -56,6 +59,13 @@ defmodule EtopTest do
       assert Etop.reporting(true) == :ok
       assert Etop.reporting(true) == :already_reporting
     end
+
+    test "init single monitor" do
+      callback = &IO.inspect({&1, &2, &3})
+      monitor = {:summary, [:load, :total], 10, callback}
+      {:ok, state} = Etop.init(monitors: monitor)
+      assert state.monitors == [monitor]
+    end
   end
 
   describe "options" do
@@ -87,6 +97,15 @@ defmodule EtopTest do
       assert Etop.status() |> Map.take([:file, :format]) == %{file: "test", format: :text}
     end
 
+    test "monitor/5" do
+      callback = fn _, _, state -> state end
+      %{monitors: monitors} = Etop.monitor(%{monitors: nil}, :summary, [:load, :total], 10, callback)
+
+      assert monitors == [
+        {:summary, [:load, :total], 10, callback}
+      ]
+    end
+
     test "file exs" do
       Etop.set_opts(file: "test.exs")
       assert Etop.status() |> Map.take([:file, :format]) == %{file: "test.exs", format: :exs}
@@ -104,14 +123,14 @@ defmodule EtopTest do
     end
 
     test "monitor/4" do
-      callback = &{&1, &2}
+      callback = &{&1, &2, &3}
       Etop.monitor(:process, :reductions, 10_000, callback)
       assert Etop.status().monitors == [{:process, :reductions, 10_000, callback}]
     end
 
     test "add_monitor/4" do
-      callback = &{&1, &2}
-      callback1 = &IO.inspect({&1, &2})
+      callback = &{&1, &2, &3}
+      callback1 = &IO.inspect({&1, &2, &3})
       Etop.monitor(:process, :reductions, 10_000, callback)
       Etop.add_monitor(:summary, [:load, :user], 50.0, callback1)
 
@@ -122,8 +141,8 @@ defmodule EtopTest do
     end
 
     test "remove_monitor/3" do
-      callback = &{&1, &2}
-      callback1 = &IO.inspect({&1, &2})
+      callback = &{&1, &2, &3}
+      callback1 = &IO.inspect({&1, &2, &3})
       Etop.monitor(:process, :reductions, 10_000, callback)
       Etop.add_monitor(:summary, [:load, :user], 50.0, callback1)
       Etop.remove_monitor(:summary, [:load, :user], 50.0)
@@ -131,19 +150,29 @@ defmodule EtopTest do
       assert Etop.status().monitors == [
                {:process, :reductions, 10_000, callback}
              ]
+
+      assert Etop.remove_monitor(:summary, [:load, :sys], 10) == :not_found
     end
 
     test "monitor clear" do
-      callback = &{&1, &2}
+      callback = &{&1, &2, &3}
       Etop.monitor(:process, :reductions, 10_000, callback)
       Etop.remove_monitors()
       assert Etop.monitors() == []
     end
 
     test "set_opts monitors" do
-      callback = &{&1, &2}
+      callback = &{&1, &2, &3}
       Etop.set_opts(monitors: [{:summary, [:load, :total], 10.0, callback}])
       assert Etop.monitors() == [{:summary, [:load, :total], 10.0, callback}]
+    end
+
+    test "set_opts monitors invalid" do
+      bad_callback = &{&1, &2}
+
+      assert capture_log(fn ->
+        %{monitors: nil} = Etop.monitor(%{monitors: nil}, :summary, [:load, :total], 10.0, bad_callback)
+      end) =~ "Invalid opts"
     end
   end
 
@@ -215,6 +244,26 @@ defmodule EtopTest do
       status = Etop.status!()
       send(Etop, :unknown)
       assert Etop.status!() == status
+    end
+  end
+
+  describe "GenServer helpers" do
+    test "reply/2" do
+      state = %{test: 1}
+      assert Etop.reply(state, :ok) == {:reply, :ok, state}
+
+      assert_raise RuntimeError, "invalid state: nil", fn ->
+        Etop.reply(nil, :ok)
+      end
+    end
+
+    test "noreply/1" do
+      state = %{test: 1}
+      assert Etop.noreply(state) == {:noreply, state}
+
+      assert_raise RuntimeError, "invalid state: nil", fn ->
+        Etop.noreply(nil)
+      end
     end
   end
 
