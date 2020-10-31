@@ -4,7 +4,7 @@ defmodule Etop.MixProject do
   def project do
     [
       app: :etop,
-      version: "0.5.4",
+      version: "0.6.0",
       elixir: "~> 1.7",
       start_permanent: Mix.env() == :prod,
       elixirc_paths: elixirc_paths(Mix.env()),

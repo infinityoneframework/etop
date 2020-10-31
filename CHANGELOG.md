@@ -1,5 +1,11 @@
 # Etop Changelog
 
+## 0.5.5 (2020-10-31)
+
+### Features
+
+* Allow monitors to return an updated state
+
 ## 0.5.4 (2020-10-29)
 
 ### Bug fixes

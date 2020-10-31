@@ -14,7 +14,7 @@ defmodule Etop.Reader do
     :status
   ]
 
-  alias Etop.Utils
+  alias Etop.{Monitor,Utils}
 
   require Logger
 
@@ -38,20 +38,12 @@ defmodule Etop.Reader do
   def handle_collect(state, stats) do
     Logger.debug(fn -> "handle_collect start" end)
 
-    stats =
-      stats
-      |> calculate_load(state)
-      |> parse_system_info()
-      |> calculate_reductions(state)
-      |> check_monitor(state)
-      |> get_processes(state)
-
-    %{state | stats: stats}
-  end
-
-  def monitor_msgq_callback(info, value) do
-    Logger.warn("Killing process with msgq: '#{inspect(value)}', info: #{inspect(info)}")
-    if Application.get_env(:etop, :monitor_kill, true), do: Process.exit(info.pid, :kill)
+    stats
+    |> calculate_load(state)
+    |> parse_system_info()
+    |> calculate_reductions(state)
+    |> Monitor.run(state)
+    |> get_processes()
   end
 
   @doc """
@@ -190,71 +182,13 @@ defmodule Etop.Reader do
     {Map.put(stats, :total, total), process_list}
   end
 
-  def check_monitor(params, %{monitors: monitors, stats: %{procs: procs}})
-      when is_nil(monitors) or is_nil(procs) or monitors == [] do
-    params
-  end
-
-  def check_monitor(params, %{monitors: monitors, stats: stats}) when is_list(monitors) do
-    Enum.each(monitors, &check_monitor(&1, params, stats))
-    params
-  end
-
-  def check_monitor(params, %{monitors: monitor, stats: stats}) when is_tuple(monitor) do
-    check_monitor(monitor, params, stats)
-    params
-  end
-
-  defp check_monitor({:process, field, threshold, callback}, {_, prev}, %{procs: curr}) do
-    prev = Enum.into(prev, %{})
-
-    Enum.each(curr, fn {pid, info} ->
-      if monitor_exceeds_threshold?(info, field, threshold) and
-           monitor_exceeds_threshold?(prev[pid], field, threshold) do
-        info
-        |> Map.put(:pid, pid)
-        |> run_monitor_callback(info[field], callback)
-      end
-    end)
-  end
-
-  defp check_monitor({:summary, fields, threshold, callback}, {curr, _}, prev) do
-    if monitor_exceeds_threshold?(curr, fields, threshold) and
-         monitor_exceeds_threshold?(prev, fields, threshold) do
-      curr
-      |> get_in([hd(fields)])
-      |> run_monitor_callback(get_in(curr, fields), callback)
-    end
-  end
-
-  defp monitor_exceeds_threshold?(info, field, threshold)
-       when is_atom(field) and (is_list(info) or is_map(info)) do
-    !!info[field] && info[field] >= threshold
-  end
-
-  defp monitor_exceeds_threshold?(stats, fields, threshold)
-       when is_list(fields) and (is_list(stats) or is_map(stats)) do
-    value = get_in(stats, fields)
-    !!value && value >= threshold
-  end
-
-  defp monitor_exceeds_threshold?(_, _, _), do: false
-
-  defp run_monitor_callback(info, value, callback) when is_function(callback) do
-    spawn(fn -> callback.(info, value) end)
-  end
-
-  defp run_monitor_callback(info, value, {mod, fun}) when is_atom(mod) and is_atom(fun) do
-    spawn(fn -> apply(mod, fun, [info, value]) end)
-  end
-
-  defp get_processes({stats, process_list}, state) do
+  defp get_processes({{stats, process_list}, state}) do
     processes =
       process_list
       |> Utils.sort(state.sort, secondary: :reductions_diff)
       |> Enum.take(state.nprocs)
 
-    Map.put(stats, :processes, processes)
+    %{state | stats: Map.put(stats, :processes, processes)}
   end
 
   def get_stats(pid),
