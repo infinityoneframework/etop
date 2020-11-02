@@ -17,6 +17,8 @@ A Unix top like functionality for Elixir Applications.
   * exs file
 * exs file logging allow loading and post processing results
 * ascii charting of results
+* Monitors
+  * Add 1 or monitors with configured data fields, thresholds, and callbacks
 
 ### Example output
 
@@ -42,7 +44,7 @@ Pid                        Name or Initial Func  Percent     Reds    Memory MssQ
 ===========================================================================================================================
 ```
 
-#### Graphs
+### Graphs
 
 Plot CPU usage from a .exs log file.
 
@@ -94,6 +96,27 @@ iex(2)> Etop.load |> Etop.Report.plot_memory(height: 15)
        +-------------------+-------------------+----------
 ```
 
+### Monitors
+
+Two types of monitors are supported:
+
+* `:summary` monitors apply to general informaton like `load` or `memory`.
+* `:process` montitors apply to any process in the process list.
+
+Monitor callbacks are arity 3 functions and can be specified as an function or
+{module, function} tuple. The are called with the Etop state map and can
+optionally return a modified version of the state. i.e. toggle reporting field.
+
+Add a monitor to trigger when total cpu load exceeds 50%.
+
+```elixir
+iex> monitor = fn info, value, state ->
+...>   IO.inspect({info, state})
+...>   %{state | reporting: true}
+...> end
+iex> Etop.add_monitor(:summary, [:load, :total], 50.0, monitor)
+```
+
 ## Why not use erlang's :etop library?
 
 There are 2 reasons why I created this library
@@ -109,7 +132,7 @@ by adding `etop` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:etop, "~> 0.5"}
+    {:etop, "~> 0.6"}
   ]
 end
 ```

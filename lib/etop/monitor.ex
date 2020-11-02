@@ -63,6 +63,15 @@ defmodule Etop.Monitor do
     try_callback(info, value, callback, state)
   end
 
+  defp run_callback(info, value, {mod, fun}, state) do
+    if function_exported?(mod, fun, 3) do
+      try_callback(info, value, &apply(mod, fun, [&1, &2, &3]), state)
+    else
+      Logger.warn("&#{mod}.#{fun}/3 is not a valid callback")
+      state
+    end
+  end
+
   # Safely run a monitor callback.
   # Run the callback and check the return for something that resembles a state map.
   # If so, return that map, otherwise return the original state map.

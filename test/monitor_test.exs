@@ -5,6 +5,14 @@ defmodule Etop.MonitorTest do
 
   alias Etop.Monitor
 
+  defmodule Callbacks do
+    require Logger
+    def callback(a, b, state) do
+      Logger.info("callback called #{inspect a}, #{inspect b}")
+      %{state | reporting: false}
+    end
+  end
+
   setup do
     {:ok, state} = Etop.init([])
     stats2 = stats2()
@@ -60,6 +68,13 @@ defmodule Etop.MonitorTest do
       end) =~ "monitor callback exception"
 
       refute_received {:monitor, _, _}
+    end
+
+    test "run mf callback", %{state: state, params: params} do
+      state = Etop.add_monitor(state, :summary, [:load, :total], 9, {Callbacks, :callback})
+      assert capture_log(fn ->
+        assert Monitor.run(params, state) == {params, %{state | reporting: false}}
+      end) =~ "callback called %{total: 12, user: 7}, 12"
     end
   end
 

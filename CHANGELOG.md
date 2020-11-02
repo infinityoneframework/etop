@@ -1,6 +1,13 @@
 # Etop Changelog
 
-## 0.5.5 (2020-10-31)
+## 0.6.1 (2020-11-02)
+
+### Bug fixes
+
+* Fix {Module, Function} callback regression
+
+
+## 0.6.0 (2020-10-31)
 
 ### Features
 
