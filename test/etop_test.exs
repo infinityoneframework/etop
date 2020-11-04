@@ -3,6 +3,8 @@ defmodule EtopTest do
 
   import ExUnit.CaptureLog
 
+  alias EtopTest.Callbacks
+
   doctest Etop
 
   @tmp_path "test/tmp"
@@ -267,6 +269,19 @@ defmodule EtopTest do
     end
   end
 
+  describe "monitor" do
+    test "summary:load:total" do
+      Etop.start(first_interval: 10, interval: 100, reporting: false)
+      Callbacks.start()
+      refute Etop.status().reporting
+      assert capture_log(fn ->
+        Callbacks.add_callback()
+        Process.sleep(150)
+      end) =~ "match 1"
+      assert Etop.status().reporting
+    end
+  end
+
   describe "common" do
     setup [:setup_log_exs]
 
@@ -404,6 +419,27 @@ defmodule EtopTest do
 
       item = hd(data)
       assert item == expected
+    end
+  end
+
+  defmodule Callbacks do
+    require Logger
+    use GenServer
+    @name __MODULE__
+    def start, do: GenServer.start(__MODULE__, [notify_log: true, no_reporting: true], name: @name)
+    def stop, do: GenServer.cast(@name, :stop)
+    def callback(info, value, etop), do: GenServer.call(@name, {:callback, info, value, etop})
+    def add_callback, do: GenServer.cast(@name, :add_callback)
+
+    def init(_), do: {:ok, nil}
+    def handle_cast(:stop, state), do: {:stop, :normal, state}
+    def handle_cast(:add_callback, state) do
+      Etop.add_monitor(:summary, [:load, :total], 0.0, {__MODULE__, :callback})
+      {:noreply, state}
+    end
+    def handle_call({:callback, _info, value, etop}, _, state) do
+      Logger.info("match 1 #{inspect value}")
+      {:reply, %{etop | reporting: true}, state}
     end
   end
 end

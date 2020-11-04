@@ -61,6 +61,15 @@ defmodule Etop do
   @type monitor :: {monitor_type(), monitor_fields(), any(), monitor_callback()}
   @type monitors :: [monitor()]
 
+  @callback alive? :: boolean()
+  @callback add_monitor(monitor_type(), monitor_fields(), any(), monitor_callback()) ::
+          no_return()
+  @callback monitor(monitor_type(), monitor_fields(), any(), monitor_callback()) :: no_return()
+  @callback start(keyword()) :: GenServer.on_start()
+  @callback stop() :: any()
+  @callback monitors() :: [tuple()]
+  @callback remove_monitors() :: any()
+
   ###############
   # Public API
 
@@ -103,6 +112,19 @@ defmodule Etop do
   end
 
   @doc """
+  Test if Etop is running.
+
+      iex> Etop.alive?()
+      false
+
+      iex> Etop.start()
+      iex> Etop.alive?()
+      true
+  """
+  @spec alive?() :: boolean()
+  def alive?, do: if(pid = Process.whereis(@name), do: Process.alive?(pid), else: false)
+
+  @doc """
   Restart Etop if its halted.
   """
   def continue(opts \\ []) do
@@ -111,20 +133,6 @@ defmodule Etop do
     else
       {:error, :no_process}
     end
-  end
-
-  @doc """
-  Load the current exs log file.
-  """
-  def load do
-    GenServer.call(@name, :load)
-  end
-
-  @doc """
-  Load the given .exs file.
-  """
-  def load(path) do
-    Etop.Report.load(path)
   end
 
   @doc """
@@ -170,6 +178,20 @@ defmodule Etop do
   @spec monitors() :: [tuple()]
   def monitors do
     GenServer.call(@name, :monitors)
+  end
+
+  @doc """
+  Load the current exs log file.
+  """
+  def load do
+    GenServer.call(@name, :load)
+  end
+
+  @doc """
+  Load the given exs log file.
+  """
+  def load(path) do
+    Report.load(path)
   end
 
   @doc """
@@ -250,6 +272,7 @@ defmodule Etop do
   @doc """
   Start Etop Reporting.
   """
+  @spec start(keyword()) :: GenServer.on_start()
   def start(opts \\ []) do
     GenServer.start(__MODULE__, opts, name: @name)
   end
@@ -571,11 +594,13 @@ defmodule Etop do
     monitors
   end
 
+  defp in?(list), do: &(&1 in list)
+
   defp valid_opts?(opts) do
     keys? =
       opts
       |> Keyword.keys()
-      |> Enum.all?(&(&1 in @valid_opts))
+      |> Enum.all?(in?(@valid_opts))
 
     keys? and valid_sort_option?(opts[:sort]) and valid_monitors?(opts[:monitors])
   end

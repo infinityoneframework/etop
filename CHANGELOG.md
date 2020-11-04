@@ -1,5 +1,11 @@
 # Etop Changelog
 
+## 0.7.0 (2020-11-04)
+
+### Features
+
+* Support for Montitor watchers
+
 ## 0.6.1 (2020-11-02)
 
 ### Bug fixes

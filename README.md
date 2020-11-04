@@ -117,6 +117,25 @@ iex> monitor = fn info, value, state ->
 iex> Etop.add_monitor(:summary, [:load, :total], 50.0, monitor)
 ```
 
+Add a monitor to trigger when the msgq length of a process is below 10.
+
+```elixir
+iex> monitor = fn info, value, state ->
+...>   IO.inspect({info, state})
+...>   %{state | reporting: false}
+...> end
+iex> Etop.add_monitor(:process, :message_queue_len, {&</2, 10}, monitor)
+iex> # or
+iex> Etop.add_monitor(:process, :message_queue_len, & &1 < 10, monitor)
+```
+
+Add a monitor to trigger when memory is > 1M and < 2M bytes
+
+```elixir
+iex> Etop.add_monitor(:summary, :message_queue_len, & &1 > 1_000_000 and
+...> &1 < 2_000_000, {MyMod, :callback})
+```
+
 ## Why not use erlang's :etop library?
 
 There are 2 reasons why I created this library

@@ -76,6 +76,43 @@ defmodule Etop.MonitorTest do
         assert Monitor.run(params, state) == {params, %{state | reporting: false}}
       end) =~ "callback called %{total: 12, user: 7}, 12"
     end
+
+    test "threshould tuple", %{state: state, params: params, monitor: monitor} do
+      state = Etop.add_monitor(state, :summary, [:load, :total], {&>=/2, 9}, monitor)
+      assert Monitor.run(params, state) == {params, %{state | reporting: false}}
+
+      assert_received {:monitor, %{total: 12, user: 7}, 12}
+    end
+
+    test "threshould tuple <", %{state: state, params: params, monitor: monitor} do
+      state = Etop.add_monitor(state, :summary, [:load, :total], {&</2, 20}, monitor)
+      assert Monitor.run(params, state) == {params, %{state | reporting: false}}
+
+      assert_received {:monitor, %{total: 12, user: 7}, 12}
+    end
+
+    test "threshold fn/1", %{state: state, params: params, monitor: monitor} do
+      state = Etop.add_monitor(state, :summary, [:load, :total], & &1 >= 9, monitor)
+      assert Monitor.run(params, state) == {params, %{state | reporting: false}}
+
+      assert_received {:monitor, %{total: 12, user: 7}, 12}
+    end
+
+    test "threshold fn/2", %{state: state, params: params, monitor: monitor} do
+      fun2 = & &1.user < 8 and &2.reporting
+
+      state1 = %{state | reporting: false}
+
+      state = Etop.add_monitor(state, :summary, [:load], fun2, monitor)
+      assert Monitor.run(params, state) == {params, %{state | reporting: false}}
+
+      assert_received {:monitor, %{total: 12, user: 7}, %{total: 12, user: 7}}
+
+      state = Etop.add_monitor(state1, :summary, [:load], fun2, monitor)
+      assert Monitor.run(params, state) == {params, state}
+
+      refute_received {:monitor, _ ,_}
+    end
   end
 
   describe "process" do

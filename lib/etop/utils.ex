@@ -127,6 +127,39 @@ defmodule Etop.Utils do
   def pad_t(string, len, char) when is_binary(string), do: String.pad_trailing(string, len, char)
   def pad_t(item, len, char), do: item |> to_string() |> pad_t(len, char)
 
+  def create_load, do: create_load(5_000_000, &(&1 * 10 + 4))
+
+  def creat_load(count) when is_integer(count), do: create_load(count, &(&1 * 10 + 4))
+  def creat_load(load) when is_function(load, 1), do: create_load(5_000_000, load)
+
+  @doc """
+  Run a short, but heavy load on the system.
+
+  Runs a tight loop for 1 = 1..5M, i * 10 + 4.
+  """
+  def create_load(count, load) when is_integer(count) and is_function(load, 1) do
+    Enum.each(1..5_000_000, load)
+  end
+
+  @doc """
+  Runs the `run_load/0 num times, sleeping for 1 second between them.
+  """
+  def run_load(num \\ 10, opts \\ []) do
+    log = opts[:log]
+    count = opts[:count] || 5_000_000
+    load = opts[:load] || &(&1 * 10 + 4)
+    sleep = Keyword.get(opts, :sleep, 1000)
+    spawn(fn ->
+      for i <- 1..num do
+        create_load(count, load)
+        if sleep, do: Process.sleep(sleep)
+        if log, do: IO.puts("Done #{i} of #{num}")
+      end
+
+      if log, do: IO.puts("Done running #{num} iterations")
+    end)
+  end
+
   @doc """
   Configurable sort.
 

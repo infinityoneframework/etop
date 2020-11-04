@@ -4,7 +4,7 @@ defmodule Etop.MixProject do
   def project do
     [
       app: :etop,
-      version: "0.6.1",
+      version: "0.7.0",
       elixir: "~> 1.7",
       start_permanent: Mix.env() == :prod,
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -48,7 +48,7 @@ defmodule Etop.MixProject do
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:ex_doc, "~> 0.22.0", override: true, only: :dev, runtime: false},
       {:excoveralls, "~> 0.10", only: :test},
-      {:dialyxir, "~> 1.0", only: [:dev], runtime: false, override: true}
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false, override: true},
     ]
   end
 
