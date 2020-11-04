@@ -151,7 +151,7 @@ by adding `etop` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:etop, "~> 0.6"}
+    {:etop, "~> 0.7"}
   ]
 end
 ```
