@@ -1,5 +1,5 @@
 defmodule Etop.Watcher do
-    @moduledoc """
+  @moduledoc """
   Etop Monitor Helpers.
 
   Setup Etop monitors for handling high CPU usage and process high message queue
@@ -11,47 +11,25 @@ defmodule Etop.Watcher do
 
   This monitor does the following:
 
-  * Turns on reporting when the CPU usage exceeds 75% and posts a message to
-    configured channel.
-
+  * Turns on reporting when the CPU usage exceeds 75% and calls the notify function.
   * Turns off the reporting when the CPU usage drops below 50%.
+
+  The `notify` function can be overridden were it can implement a custom handler that
+  can send an email, post a message to a messaging application, etc.
 
   ### Message Queue Length monitor
 
   This monitor does the following:
 
-  * Posts a single message to the configured channel when a process's message queue
-    length exceeds (1_500) messages.
-  * Posts another message for the same process exceeding (1_500) messages once its
+  * Calls notify when the length exceeds (1_500) messages.
+  * Calls notify when the same process exceeding (1_500) messages once its
     length drops below (1_050) messages
-  * Kills the process if the message queue length exceeds (20_000) messages and
-    posts a message to the configured channel
-
-  ## Usage
-
-  Fist, you need to start Etop with the desired options
-
-      iex> Etop.start(interval: 30_000)
-
-  If you want notifications posted to a message channel, first run the following:
-
-      iex> EtopHelpers.set_channel_name("general")
-
-  Then start the tracking agent and install the monitors:
-
-      iex> EtopHelpers.start()
-
-  Finally, if you want to stop the tracking agent and remove the monitors
-
-      iex> EtopHelpers.stop()
-
+  * Kills the process if the message queue length exceeds (20_000) messages and calls notify.
 
   ## Configuration
 
   The following can be configured with `Application.put_env(:infinity_one, option, value):
 
-  * `:etop_notify_user` ("bot") - the post as username
-  * `:etop_notify_channel_name` (nil) - the channel name to post alerts
   * `:etop_msg_q_stop_limit` (20_000) - when to kill the process
   * `:etop_msg_q_notify_limit` (1_500) - when to notify
   * `:etop_msg_q_notify_lower_limit` (1_000) - When the monitor callback is called
@@ -85,6 +63,17 @@ defmodule Etop.Watcher do
       Start the Etop monitors.
 
       Starts the Agent and installs the Etop monitors.
+
+      ## Options
+
+      * reporting (true) - Don't disable Etop.reporting when false.
+      * msg_q_stop_limit: msg_q_stop_limit(),
+      * msg_q_notify_limit: msg_q_notify_limit(),
+      * msg_q_notify_lower_limit: msg_q_notify_lower_limit(),
+      * reporting_enable_limit: reporting_enable_limit(),
+      * reporting_disable_limit: reporting_disable_limit(),
+      * reporting_notify_lower_limit: reporting_notify_lower_limit(),
+      * no_reporting (false) - don't enable Etop.reporting when true
       """
       @spec start(keyword()) :: any()
       def start(opts \\ []) do
@@ -94,9 +83,17 @@ defmodule Etop.Watcher do
       @doc """
       Start the Etop monitors.
       """
-      @spec start(keyword()) :: any()
+      @spec start_link(keyword()) :: any()
       def start_link(opts \\ []) do
         GenServer.start_link(__MODULE__, opts, name: @name)
+      end
+
+      @doc """
+      Add the monitors.
+      """
+      @spec add_monitors() :: none()
+      def add_monitors do
+        GenServer.cast(@name, :add_monitors)
       end
 
       @doc """
@@ -108,7 +105,7 @@ defmodule Etop.Watcher do
       end
 
       @doc """
-      The prcosse message queue lenth monitor callback.
+      The process message queue length monitor callback.
       """
       @spec message_queue_callback(any(), any(), map()) :: any()
       def message_queue_callback(info, value, state) do
@@ -266,11 +263,13 @@ defmodule Etop.Watcher do
       end
 
       def handle_load_reporting_enable(state, _info, value, etop) do
-        {set_reporting(state, etop), notify(state, :load, "Etop high CPU usage: #{inspect(value)}")}
+        {set_reporting(state, etop),
+         notify(state, :load, "Etop high CPU usage: #{inspect(value)}")}
       end
 
       def handle_load_reporting_lower_limit(state, _info, value, etop) do
-        {clear_reporting(state, etop), notify_disable(state, :load, "Etop high CPU usage resolved: #{inspect(value)}")}
+        {clear_reporting(state, etop),
+         notify_disable(state, :load, "Etop high CPU usage resolved: #{inspect(value)}")}
       end
 
       def handle_load_reporting_disable(state, _info, value, etop) do
@@ -312,46 +311,64 @@ defmodule Etop.Watcher do
 
       def handle_msg_q_stop_limit(state, info, value, etop) do
         # :etop_msg_q_stop_limit, 20_000
+        pid = info[:pid]
+
         notify(
           state,
-          "Killing process with high msg_q length: #{inspect(value)}, pid: #{
-            inspect(info[:pid])
-          }, info: #{inspect(info)}"
+          "Killing process with high msg_q length: #{inspect(value)}, pid: #{inspect(pid)}, info: #{
+            inspect(info)
+          }"
         )
 
-        Process.exit(info[:pid], :kill)
+        Process.exit(pid, :kill)
 
-        {etop, clear_key(state, {:msgq, info[:pid]})}
+        {clear_proc_r(etop, pid), clear_key(state, {:msgq, pid})}
       end
 
       def handle_msg_q_limit(state, info, value, etop) do
         # :etop_msg_q_notify_limit, 1_500
+        pid = info[:pid]
 
-        {set_reporting(state, etop),
-        notify(
-          state,
-          {:msgq, info[:pid]},
-          "High message queue length: #{inspect(value)}, pid: #{inspect(info[:pid])}"
-        )}
+        {set_reporting(state, set_proc_r(etop, pid)),
+         notify(
+           state,
+           {:msgq, pid},
+           "High message queue length: #{inspect(value)}, pid: #{inspect(pid)}"
+         )}
       end
 
       def handle_msg_q_lower_limit(state, info, value, etop) do
         # :etop_msg_q_notify_lower_limit, 1_000
-        if get_key(state, {:msgq, info[:pid]}) do
-          notify(
-            state,
-            {:msgq, info[:pid]},
-            "High Message queue alert resolved, pid: #{inspect(info[:pid])}"
-          )
+        pid = info[:pid]
 
-          {clear_reporting(state, etop), clear_key(state, {:msgq, info[:pid]})}
-        else
-          {etop, state}
-        end
+        {clear_reporting(state, clear_proc_r(etop, pid)),
+         notify_disable(
+           state,
+           {:msgq, pid},
+           "High Message queue alert resolved, pid: #{inspect(pid)}"
+         )}
       end
 
       def handle_msg_q_default(state, _info, _value, etop) do
         {etop, state}
+      end
+
+      defp set_proc_r(etop, pid) do
+        proc_r = etop[:proc_r] || MapSet.new()
+        Map.put(etop, :proc_r, MapSet.put(proc_r, pid))
+      end
+
+      defp clear_proc_r(etop, pid) do
+        set =
+          &if(MapSet.size(&1) == 0,
+            do: Map.delete(etop, :proc_r),
+            else: Map.put(etop, :proc_r, &1)
+          )
+
+        case etop[:proc_r] do
+          nil -> etop
+          proc_r -> set.(MapSet.delete(proc_r, pid))
+        end
       end
 
       @doc """
@@ -366,9 +383,9 @@ defmodule Etop.Watcher do
         end
 
         unless Enum.find(
-                monitors,
-                find_monitor(:process, :message_queue_len, state.msg_q_notify_lower_limit)
-              ) do
+                 monitors,
+                 find_monitor(:process, :message_queue_len, state.msg_q_notify_lower_limit)
+               ) do
           add_message_queue_monitor(state)
         end
 
@@ -379,13 +396,14 @@ defmodule Etop.Watcher do
       Add the CPU utilization monitor.
       """
       def add_reporting_monitor(state) do
-        etop().add_monitor(:summary, [:load, :total], load_threshold(state), {__MODULE__, :load_callback})
-        state
-      end
+        etop().add_monitor(
+          :summary,
+          [:load, :total],
+          load_threshold(state),
+          {__MODULE__, :load_callback}
+        )
 
-      def load_threshold(state) do
-        %{reporting_enable_limit: limit1, reporting_notify_lower_limit: limit2} = state
-        & &1 >= limit1 or (&2.reporting and &1 <= limit2)
+        state
       end
 
       @doc """
@@ -402,10 +420,22 @@ defmodule Etop.Watcher do
         state
       end
 
+      @doc """
+      Create the load threshold comparator/2 function.
+      """
+      @spec load_threshold(map()) :: (number(), map() -> boolean())
+      def load_threshold(state) do
+        %{reporting_enable_limit: limit1, reporting_notify_lower_limit: limit2} = state
+        &(&1 >= limit1 or (&2.reporting and &1 <= limit2))
+      end
+
+      @doc """
+      Create the msgq threshold comparator/3 function.
+      """
       @spec msgq_threshold(map()) :: (number(), map() -> boolean())
-      def msgq_threshold(state) do
-        %{ msg_q_stop_limit: limit1, msg_q_notify_limit: limit2 } = state
-        & &1 >= limit1 or (&2.reporting and &1 <= limit2)
+      def msgq_threshold(%{msg_q_notify_limit: limit} = state) do
+        r_test = &(!!&1[:proc_r] and MapSet.member?(&1[:proc_r], &2[:pid]))
+        &(&1 >= limit or r_test.(&3, &2))
       end
 
       @spec initial_state(keyword()) :: map()
@@ -472,6 +502,7 @@ defmodule Etop.Watcher do
             level when level in ~w(error warn info debug)a -> level
             _ -> nil
           end
+
         if level, do: Logger.log(level, message)
         state
       end
@@ -502,19 +533,6 @@ defmodule Etop.Watcher do
         do: Application.get_env(:infinity_one, :etop_reporting_notify_lower_limit, 10.0)
 
       defoverridable(
-        notify: 2,
-        notify: 3,
-        notify_disable: 3,
-        start: 0,
-        start: 1,
-        start_link: 0,
-        start_link: 1,
-        msg_q_stop_limit: 0,
-        msg_q_notify_limit: 0,
-        msg_q_notify_lower_limit: 0,
-        reporting_enable_limit: 0,
-        reporting_disable_limit: 0,
-        reporting_notify_lower_limit: 0,
         handle_load_reporting_enable: 4,
         handle_load_reporting_lower_limit: 4,
         handle_load_reporting_disable: 4,
@@ -523,6 +541,22 @@ defmodule Etop.Watcher do
         handle_msg_q_limit: 4,
         handle_msg_q_lower_limit: 4,
         handle_msg_q_default: 4,
+        initial_state: 1,
+        load_threshold: 1,
+        msgq_threshold: 1,
+        msg_q_notify_limit: 0,
+        msg_q_notify_lower_limit: 0,
+        msg_q_stop_limit: 0,
+        notify: 2,
+        notify: 3,
+        notify_disable: 3,
+        reporting_disable_limit: 0,
+        reporting_enable_limit: 0,
+        reporting_notify_lower_limit: 0,
+        start: 0,
+        start: 1,
+        start_link: 0,
+        start_link: 1
       )
     end
   end

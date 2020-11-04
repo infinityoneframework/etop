@@ -48,7 +48,7 @@ defmodule Etop.MixProject do
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:ex_doc, "~> 0.22.0", override: true, only: :dev, runtime: false},
       {:excoveralls, "~> 0.10", only: :test},
-      {:dialyxir, "~> 1.0", only: [:dev], runtime: false, override: true},
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false, override: true}
     ]
   end
 

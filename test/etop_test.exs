@@ -101,11 +101,13 @@ defmodule EtopTest do
 
     test "monitor/5" do
       callback = fn _, _, state -> state end
-      %{monitors: monitors} = Etop.monitor(%{monitors: nil}, :summary, [:load, :total], 10, callback)
+
+      %{monitors: monitors} =
+        Etop.monitor(%{monitors: nil}, :summary, [:load, :total], 10, callback)
 
       assert monitors == [
-        {:summary, [:load, :total], 10, callback}
-      ]
+               {:summary, [:load, :total], 10, callback}
+             ]
     end
 
     test "file exs" do
@@ -173,8 +175,9 @@ defmodule EtopTest do
       bad_callback = &{&1, &2}
 
       assert capture_log(fn ->
-        %{monitors: nil} = Etop.monitor(%{monitors: nil}, :summary, [:load, :total], 10.0, bad_callback)
-      end) =~ "Invalid opts"
+               %{monitors: nil} =
+                 Etop.monitor(%{monitors: nil}, :summary, [:load, :total], 10.0, bad_callback)
+             end) =~ "Invalid opts"
     end
   end
 
@@ -274,10 +277,12 @@ defmodule EtopTest do
       Etop.start(first_interval: 10, interval: 100, reporting: false)
       Callbacks.start()
       refute Etop.status().reporting
+
       assert capture_log(fn ->
-        Callbacks.add_callback()
-        Process.sleep(150)
-      end) =~ "match 1"
+               Callbacks.add_callback()
+               Process.sleep(150)
+             end) =~ "match 1"
+
       assert Etop.status().reporting
     end
   end
@@ -426,19 +431,23 @@ defmodule EtopTest do
     require Logger
     use GenServer
     @name __MODULE__
-    def start, do: GenServer.start(__MODULE__, [notify_log: true, no_reporting: true], name: @name)
+    def start,
+      do: GenServer.start(__MODULE__, [notify_log: true, no_reporting: true], name: @name)
+
     def stop, do: GenServer.cast(@name, :stop)
     def callback(info, value, etop), do: GenServer.call(@name, {:callback, info, value, etop})
     def add_callback, do: GenServer.cast(@name, :add_callback)
 
     def init(_), do: {:ok, nil}
     def handle_cast(:stop, state), do: {:stop, :normal, state}
+
     def handle_cast(:add_callback, state) do
       Etop.add_monitor(:summary, [:load, :total], 0.0, {__MODULE__, :callback})
       {:noreply, state}
     end
+
     def handle_call({:callback, _info, value, etop}, _, state) do
-      Logger.info("match 1 #{inspect value}")
+      Logger.info("match 1 #{inspect(value)}")
       {:reply, %{etop | reporting: true}, state}
     end
   end

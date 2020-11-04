@@ -147,8 +147,9 @@ defmodule Etop.Utils do
   def run_load(num \\ 10, opts \\ []) do
     log = opts[:log]
     count = opts[:count] || 5_000_000
-    load = opts[:load] || &(&1 * 10 + 4)
+    load = opts[:load] || (&(&1 * 10 + 4))
     sleep = Keyword.get(opts, :sleep, 1000)
+
     spawn(fn ->
       for i <- 1..num do
         create_load(count, load)

@@ -31,11 +31,12 @@ defmodule Etop.Monitor do
     prev = Enum.into(prev, %{})
 
     Enum.reduce(curr, state, fn {pid, info}, state ->
+      info = put_in(info, [:pid], pid)
+      prev_info = if item = prev[pid], do: put_in(item, [:pid], pid), else: nil
+
       if exceeds_threshold?(state, info, field, threshold) and
-           exceeds_threshold?(state, prev[pid], field, threshold) do
-        info
-        |> Map.put(:pid, pid)
-        |> run_callback(info[field], callback, state)
+           exceeds_threshold?(state, prev_info, field, threshold) do
+        run_callback(info, info[field], callback, state)
       else
         state
       end
@@ -65,8 +66,12 @@ defmodule Etop.Monitor do
     exceeds_threshold?(state, info, field, fn value -> fun.(value, state) end)
   end
 
+  defp exceeds_threshold?(state, info, field, fun) when is_function(fun, 3) do
+    exceeds_threshold?(state, info, field, fn value -> fun.(value, info, state) end)
+  end
+
   defp exceeds_threshold?(state, info, field, threshold) when not is_function(threshold) do
-    exceeds_threshold?(state, info, field, & &1 >= threshold)
+    exceeds_threshold?(state, info, field, &(&1 >= threshold))
   end
 
   defp exceeds_threshold?(_state, info, field, comparator)
@@ -106,8 +111,8 @@ defmodule Etop.Monitor do
       end
     rescue
       e ->
-        Logger.warn("monitor callback exception: #{inspect e}, callback: #{inspect callback}")
+        Logger.warn("monitor callback exception: #{inspect(e)}, callback: #{inspect(callback)}")
         state
-     end
+    end
   end
 end

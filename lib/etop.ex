@@ -63,7 +63,7 @@ defmodule Etop do
 
   @callback alive? :: boolean()
   @callback add_monitor(monitor_type(), monitor_fields(), any(), monitor_callback()) ::
-          no_return()
+              no_return()
   @callback monitor(monitor_type(), monitor_fields(), any(), monitor_callback()) :: no_return()
   @callback start(keyword()) :: GenServer.on_start()
   @callback stop() :: any()
@@ -91,8 +91,7 @@ defmodule Etop do
       ...> ]
       true
   """
-  @spec add_monitor(monitor_type(), monitor_fields(), any(), monitor_callback()) ::
-          no_return()
+  @spec add_monitor(monitor_type(), monitor_fields(), any(), monitor_callback()) :: no_return()
   def add_monitor(type, field, threshold, callback) do
     GenServer.cast(@name, {:add_monitor, {type, field, threshold, callback}})
   end
