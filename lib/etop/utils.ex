@@ -142,7 +142,7 @@ defmodule Etop.Utils do
   end
 
   @doc """
-  Runs the `run_load/0 num times, sleeping for 1 second between them.
+  Runs the `run_load/0` num times, sleeping for 1 second between them.
   """
   def run_load(num \\ 10, opts \\ []) do
     log = opts[:log]

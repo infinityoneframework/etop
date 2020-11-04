@@ -28,7 +28,7 @@ defmodule Etop.Watcher do
 
   ## Configuration
 
-  The following can be configured with `Application.put_env(:infinity_one, option, value):
+  The following can be configured with `Application.put_env(:infinity_one, option, value)`:
 
   * `:etop_msg_q_stop_limit` (20_000) - when to kill the process
   * `:etop_msg_q_notify_limit` (1_500) - when to notify
