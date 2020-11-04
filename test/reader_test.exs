@@ -158,7 +158,6 @@ defmodule Etop.ReaderTest do
            ]
   end
 
-
   defp get_stats(state) do
     Reader.remote_stats(state)
     assert_receive {:result, stats}

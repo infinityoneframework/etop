@@ -14,7 +14,7 @@ defmodule Etop.Reader do
     :status
   ]
 
-  alias Etop.{Monitor,Utils}
+  alias Etop.{Monitor, Utils}
 
   require Logger
 
