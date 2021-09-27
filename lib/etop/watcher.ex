@@ -91,7 +91,7 @@ defmodule Etop.Watcher do
       @doc """
       Add the monitors.
       """
-      @spec add_monitors() :: none()
+      @spec add_monitors() :: :ok
       def add_monitors do
         GenServer.cast(@name, :add_monitors)
       end
@@ -117,7 +117,7 @@ defmodule Etop.Watcher do
 
       Stops the EtopHelpers Agent and removes the monitors.
       """
-      @spec stop() :: no_return()
+      @spec stop() :: :ok
       def stop do
         GenServer.cast(@name, :stop)
         etop().remove_monitors()
@@ -126,7 +126,7 @@ defmodule Etop.Watcher do
       @doc """
       Set a key on the servers state.
       """
-      @spec set_opts(any(), any()) :: none()
+      @spec set_opts(any(), any()) :: :ok
       def set_opts(key, value) do
         GenServer.cast(@name, {:set_opts, [{key, value}]})
       end
@@ -134,7 +134,7 @@ defmodule Etop.Watcher do
       @doc """
       Set a list of server's state keys.
       """
-      @spec set_opts(keyword()) :: none()
+      @spec set_opts(keyword()) :: :ok
       def set_opts(opts) when is_list(opts) do
         GenServer.cast(@name, {:set_opts, opts})
       end
@@ -374,7 +374,7 @@ defmodule Etop.Watcher do
       @doc """
       Add the Etop monitors.
       """
-      @spec add_monitors(map()) :: no_return()
+      @spec add_monitors(map()) :: map()
       def add_monitors(state) do
         monitors = etop().monitors()
 
@@ -432,7 +432,7 @@ defmodule Etop.Watcher do
       @doc """
       Create the msgq threshold comparator/3 function.
       """
-      @spec msgq_threshold(map()) :: (number(), map() -> boolean())
+      @spec msgq_threshold(map()) :: (number(), map(), map() -> boolean())
       def msgq_threshold(%{msg_q_notify_limit: limit} = state) do
         r_test = &(!!&1[:proc_r] and MapSet.member?(&1[:proc_r], &2[:pid]))
         &(&1 >= limit or r_test.(&3, &2))
