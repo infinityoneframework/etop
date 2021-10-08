@@ -55,7 +55,7 @@ defmodule Etop.Chart do
   * height (20 default) - the height of the y axis
   * width (100) - the width of the x axis
   * y_label_postfix ("") - the appended y axis label
-  * title (nil) - Sting printed at the top of the chart
+  * title (nil) - String printed at the top of the chart
   * labels (nil) - List of x-axis labels
   * empty_char (0x20 - space) - the character for an empty char
   * plot_char (?*) - the character for a plot point

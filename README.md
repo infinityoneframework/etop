@@ -1,7 +1,10 @@
-# Etop - A Unix like top library for Elixir Applications
+# Etop
 
-[license-img]: http://img.shields.io/badge/license-MIT-brightgreen.svg
-[license]: http://opensource.org/licenses/MIT
+[![Module Version](https://img.shields.io/hexpm/v/etop.svg)](https://hex.pm/packages/etop)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/etop/)
+[![Total Download](https://img.shields.io/hexpm/dt/etop.svg)](https://hex.pm/packages/etop)
+[![License](https://img.shields.io/hexpm/l/etop.svg)](https://github.com/infinityoneframework/etop/blob/master/LICENSE.md)
+[![Last Updated](https://img.shields.io/github/last-commit/infinityoneframework/etop.svg)](https://github.com/infinityoneframework/etop/commits/master)
 
 A Unix top like functionality for Elixir Applications.
 
@@ -100,7 +103,7 @@ iex(2)> Etop.load |> Etop.Report.plot_memory(height: 15)
 
 Two types of monitors are supported:
 
-* `:summary` monitors apply to general informaton like `load` or `memory`.
+* `:summary` monitors apply to general information like `load` or `memory`.
 * `:process` montitors apply to any process in the process list.
 
 Monitor callbacks are arity 3 functions and can be specified as an function or
@@ -145,8 +148,7 @@ There are 2 reasons why I created this library
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `etop` to your list of dependencies in `mix.exs`:
+The package can be installed by adding `:etop` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
@@ -156,14 +158,9 @@ def deps do
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/etop](https://hexdocs.pm/etop).
-
-## License
+## Copyright and License
 
 `Etop` is Copyright (c) 2020-2021 E-MetroTel
 
-The source code is released under the MIT License.
-
-Check [LICENSE](LICENSE.md) for more information.
+This work is free. You can redistribute it and/or modify it under the
+terms of the MIT License. See the [LICENSE.md](./LICENSE.md) file for more details.

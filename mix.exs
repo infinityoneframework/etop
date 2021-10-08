@@ -1,20 +1,20 @@
 defmodule Etop.MixProject do
   use Mix.Project
 
+  @source_url "https://github.com/infinityoneframework/etop"
+  @version "0.7.0"
+
   def project do
     [
       app: :etop,
-      version: "0.7.0",
+      version: @version,
       elixir: "~> 1.7",
       start_permanent: Mix.env() == :prod,
       elixirc_paths: elixirc_paths(Mix.env()),
-      deps: deps(),
       name: "Etop",
+      deps: deps(),
       package: package(),
-      docs: [
-        main: "Etop",
-        extras: ["README.md", "LICENSE.md"]
-      ],
+      docs: docs(),
       dialyzer: [
         plt_add_deps: :app_tree
       ],
@@ -24,10 +24,7 @@ defmodule Etop.MixProject do
         "coveralls.detail": :test,
         "coveralls.post": :test,
         "coveralls.html": :test
-      ],
-      description: """
-      A Unix top like functionality for Elixir Applications.
-      """
+      ]
     ]
   end
 
@@ -46,7 +43,7 @@ defmodule Etop.MixProject do
     [
       {:cpu_util, "~> 0.5"},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
-      {:ex_doc, "~> 0.22.0", override: true, only: :dev, runtime: false},
+      {:ex_doc, ">= 0.0.0", override: true, only: :dev, runtime: false},
       {:excoveralls, "~> 0.10", only: :test},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false, override: true}
     ]
@@ -54,10 +51,24 @@ defmodule Etop.MixProject do
 
   defp package do
     [
+      description: "A Unix top like functionality for Elixir Applications.",
       maintainers: ["Stephen Pallen"],
       licenses: ["MIT"],
-      links: %{"Github" => "https://github.com/infinityoneframework/etop"},
-      files: ~w(lib README.md mix.exs LICENSE.md)
+      files: ~w(lib README.md mix.exs LICENSE.md),
+      links: %{"Github" => @source_url}
+    ]
+  end
+
+  defp docs do
+    [
+      extras: [
+        "LICENSE.md": [title: "License"],
+        "README.md": [title: "Overview"]
+      ],
+      main: "readme",
+      source_url: @source_url,
+      source_ref: "v#{@version}",
+      formatters: ["html"]
     ]
   end
 end
