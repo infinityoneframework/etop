@@ -409,7 +409,7 @@ defmodule Etop.Report do
   defp format_fun(_), do: ""
 
   defp name_or_initial_fun(reds, l2) do
-    reds[:registerd_name]
+    reds[:registered_name]
     |> case do
       nil -> format_fun(dict_initial_call(reds) || reds[:initial_call])
       name when is_atom(name) -> name
