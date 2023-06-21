@@ -18,9 +18,9 @@ import Config
 #
 # You can also configure a 3rd-party app:
 #
-config :logger,
+config :logger, :console,
   level: :info,
-  format: "$time [$level]$levelpad$metadata$message\n",
+  format: "$time [$level] $metadata$message\n",
   metadata: [:module, :function, :line]
 
 # It is also possible to import configuration files, relative to this
