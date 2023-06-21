@@ -95,7 +95,7 @@ defmodule Etop.Monitor do
     if function_exported?(mod, fun, 3) do
       try_callback(info, value, &apply(mod, fun, [&1, &2, &3]), state)
     else
-      Logger.warn("&#{mod}.#{fun}/3 is not a valid callback")
+      Logger.warning("&#{mod}.#{fun}/3 is not a valid callback")
       state
     end
   end
@@ -111,7 +111,7 @@ defmodule Etop.Monitor do
       end
     rescue
       e ->
-        Logger.warn("monitor callback exception: #{inspect(e)}, callback: #{inspect(callback)}")
+        Logger.warning("monitor callback exception: #{inspect(e)}, callback: #{inspect(callback)}")
         state
     end
   end
