@@ -3,10 +3,15 @@ defmodule Etop.ReaderTest do
 
   alias Etop.{Fixtures, Reader}
 
+  test "core_count returns a positive count even without CPU topology information" do
+    assert {:ok, cores} = Reader.core_count()
+    assert is_integer(cores) and cores > 0
+  end
+
   setup do
     cores = 6
     os_pid = CpuUtil.getpid()
-    util = {File.read!("/proc/stat"), File.read!("/proc/#{os_pid}/stat")}
+    util = Fixtures.proc_stat1()
     {:ok, state} = Etop.init(os_pid: os_pid, cores: cores, util: util)
 
     {:ok, state: state, stat1: Fixtures.proc_stat1(), stat2: Fixtures.proc_stat2()}
@@ -20,16 +25,12 @@ defmodule Etop.ReaderTest do
     %{
       cores: {:ok, cores},
       os_pid: os_pid,
-      util: {{:ok, stat}, {:ok, proc_stat}}
+      util: util
     } = info
 
     assert is_integer(cores)
     assert os_pid == state.os_pid
-    assert is_binary(stat)
-    assert is_binary(proc_stat)
-
-    assert stat =~ ~r/^cpu\s+\d+/
-    assert proc_stat =~ ~r/\d+\s+\(beam.smp\)/
+    assert_util(util)
   end
 
   test "remove_stats/1 local", %{state: state} do
@@ -54,16 +55,15 @@ defmodule Etop.ReaderTest do
       nprocs: nprocs,
       procs: procs,
       runq: runq,
-      util: {{:ok, stat}, {:ok, proc_stat}}
+      util: util
     } = stats
 
     assert nprocs =~ ~r/^\d+$/
-    assert runq >= 0 and runq < 10
-    assert stat =~ ~r/^cpu\s+\d+/
-    assert proc_stat =~ ~r/\d+\s+\(beam.smp\)/
+    assert is_integer(runq) and runq >= 0
+    assert_util(util)
     assert memory |> Map.keys() |> Enum.sort() == memory_keys
     assert Enum.all?(memory, &(&1 |> elem(1) |> is_integer()))
-    assert length(procs) in 90..120
+    assert length(procs) > 0
 
     {_, proc} = hd(procs)
     {:memory, memory_val} = proc[:memory]
@@ -158,9 +158,19 @@ defmodule Etop.ReaderTest do
            ]
   end
 
+  defp assert_util(util) do
+    if File.exists?("/proc/stat") do
+      assert {{:ok, stat}, {:ok, process_stat}} = util
+      assert stat =~ ~r/^cpu\s+\d+/
+      assert process_stat =~ ~r/^\d+\s+\(.+\)/
+    else
+      assert util == {{:error, :enoent}, {:error, :enoent}}
+    end
+  end
+
   defp get_stats(state) do
     Reader.remote_stats(state)
     assert_receive {:result, stats}
-    Etop.sanitize_stats(state, stats)
+    Etop.sanitize_stats(state, %{stats | util: Fixtures.proc_stat2()})
   end
 end

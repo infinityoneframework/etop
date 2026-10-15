@@ -29,7 +29,7 @@ defmodule Etop.ReportTest do
                msg_q: 0,
                name: ":application_master.start_it/4",
                percent: 37.83,
-               pid: '<0.141.0>',
+               pid: ~c"<0.141.0>",
                reds_diff: 300,
                reductions: 338,
                state: :waiting
@@ -40,7 +40,7 @@ defmodule Etop.ReportTest do
                msg_q: 0,
                name: ":supervisor.Elixir.Supervisor.Defau",
                percent: 50.44,
-               pid: '<0.142.0>',
+               pid: ~c"<0.142.0>",
                reds_diff: 400,
                reductions: 455,
                state: :waiting
@@ -366,7 +366,7 @@ defmodule Etop.ReportTest do
 
   defp procs1,
     do: [
-      {pid('<0.141.0>'),
+      {pid(~c"<0.141.0>"),
        Enum.into(
          [
            memory: {:memory, 8888},
@@ -375,12 +375,12 @@ defmodule Etop.ReportTest do
            initial_call: {:application_master, :start_it, 4},
            status: :waiting,
            message_queue_len: 0,
-           links: [pid('<0.140.0>'), pid('<0.142.0>')],
+           links: [pid(~c"<0.140.0>"), pid(~c"<0.142.0>")],
            dictionary: [],
            trap_exit: true,
            error_handler: :error_handler,
            priority: :normal,
-           group_leader: pid('<0.140.0>'),
+           group_leader: pid(~c"<0.140.0>"),
            total_heap_size: 986,
            heap_size: 376,
            stack_size: 5,
@@ -396,7 +396,7 @@ defmodule Etop.ReportTest do
          ],
          %{}
        )},
-      {pid('<0.142.0>'),
+      {pid(~c"<0.142.0>"),
        Enum.into(
          [
            memory: {:memory, 7104},
@@ -406,15 +406,15 @@ defmodule Etop.ReportTest do
            initial_call: {:proc_lib, :init_p, 5},
            status: :waiting,
            message_queue_len: 0,
-           links: [pid('<0.143.0>'), pid('<0.144.0>')],
+           links: [pid(~c"<0.143.0>"), pid(~c"<0.144.0>")],
            dictionary: [
-             "$ancestors": [pid('<0.141.0>')],
+             "$ancestors": [pid(~c"<0.141.0>")],
              "$initial_call": {:supervisor, Supervisor.Default, 1}
            ],
            trap_exit: true,
            error_handler: :error_handler,
            priority: :normal,
-           group_leader: pid('<0.140.0>'),
+           group_leader: pid(~c"<0.140.0>"),
            total_heap_size: 752,
            heap_size: 376,
            stack_size: 10,
