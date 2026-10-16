@@ -20,7 +20,7 @@ defmodule Etop.Utils do
       iex> Etop.Utils.center("Test", 8)
       "  Test  "
 
-      iex> Etop.Utils.center('Test', 7, "-")
+      iex> Etop.Utils.center(~c"Test", 7, "-")
       "-Test--"
 
       iex> Etop.Utils.center("test", 2)

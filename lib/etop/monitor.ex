@@ -76,13 +76,20 @@ defmodule Etop.Monitor do
 
   defp exceeds_threshold?(_state, info, field, comparator)
        when is_function(comparator, 1) and is_atom(field) and (is_list(info) or is_map(info)) do
-    comparator.(!!info[field] && info[field])
+    case info[field] do
+      nil -> false
+      value -> comparator.(value)
+    end
   end
 
   defp exceeds_threshold?(_state, stats, fields, comparator)
        when is_function(comparator, 1) and is_list(fields) and (is_list(stats) or is_map(stats)) do
     value = get_in(stats, fields)
-    comparator.(!!value && value)
+
+    case value do
+      nil -> false
+      value -> comparator.(value)
+    end
   end
 
   defp exceeds_threshold?(_, _, _, _), do: false
@@ -95,7 +102,7 @@ defmodule Etop.Monitor do
     if function_exported?(mod, fun, 3) do
       try_callback(info, value, &apply(mod, fun, [&1, &2, &3]), state)
     else
-      Logger.warn("&#{mod}.#{fun}/3 is not a valid callback")
+      Logger.warning("&#{mod}.#{fun}/3 is not a valid callback")
       state
     end
   end
@@ -111,7 +118,10 @@ defmodule Etop.Monitor do
       end
     rescue
       e ->
-        Logger.warn("monitor callback exception: #{inspect(e)}, callback: #{inspect(callback)}")
+        Logger.warning(
+          "monitor callback exception: #{inspect(e)}, callback: #{inspect(callback)}"
+        )
+
         state
     end
   end

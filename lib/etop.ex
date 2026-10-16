@@ -586,7 +586,7 @@ defmodule Etop do
   defp valid_monitors?(monitor), do: valid_monitor?(monitor)
 
   defp validate_monitors!(monitors) do
-    unless valid_monitors?(monitors) do
+    if !valid_monitors?(monitors) do
       raise "Invalid monitor #{inspect(monitors)}"
     end
 

@@ -25,7 +25,7 @@ A.add(%{
       msg_q: 0,
       name: ":erlang.apply/2",
       percent: 29.28,
-      pid: '<0.9.0>',
+      pid: ~c"<0.9.0>",
       reds_diff: 921_464,
       reductions: 921_464,
       state: :waiting
@@ -36,7 +36,7 @@ A.add(%{
       msg_q: 0,
       name: "IEx.Evaluator.init/4",
       percent: 27.83,
-      pid: '<0.226.0>',
+      pid: ~c"<0.226.0>",
       reds_diff: 875_941,
       reductions: 875_941,
       state: :waiting
@@ -47,7 +47,7 @@ A.add(%{
       msg_q: 10,
       name: ":erlang.apply/2",
       percent: 7.69,
-      pid: '<0.49.0>',
+      pid: ~c"<0.49.0>",
       reds_diff: 241_976,
       reductions: 241_976,
       state: :waiting
@@ -58,7 +58,7 @@ A.add(%{
       msg_q: 0,
       name: ":group.server/3",
       percent: 6.56,
-      pid: '<0.64.0>',
+      pid: ~c"<0.64.0>",
       reds_diff: 206_407,
       reductions: 206_407,
       state: :waiting
@@ -69,7 +69,7 @@ A.add(%{
       msg_q: 5,
       name: ":user_drv.server/2",
       percent: 5.46,
-      pid: '<0.62.0>',
+      pid: ~c"<0.62.0>",
       reds_diff: 172_007,
       reductions: 172_007,
       state: :waiting
@@ -80,7 +80,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_code_purger.start/0",
       percent: 5.22,
-      pid: '<0.1.0>',
+      pid: ~c"<0.1.0>",
       reds_diff: 164_253,
       reductions: 164_253,
       state: :waiting
@@ -91,7 +91,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_literal_area_collector.start/",
       percent: 5.01,
-      pid: '<0.2.0>',
+      pid: ~c"<0.2.0>",
       reds_diff: 157_751,
       reductions: 157_751,
       state: :waiting
@@ -102,7 +102,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_controller.start/1",
       percent: 4.89,
-      pid: '<0.43.0>',
+      pid: ~c"<0.43.0>",
       reds_diff: 153_876,
       reductions: 153_876,
       state: :waiting
@@ -113,7 +113,7 @@ A.add(%{
       msg_q: 4,
       name: ":file_server.init/1",
       percent: 3.59,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 112_924,
       reductions: 112_924,
       state: :waiting
@@ -124,7 +124,7 @@ A.add(%{
       msg_q: 0,
       name: ":disk_log.init/2",
       percent: 1.22,
-      pid: '<0.79.0>',
+      pid: ~c"<0.79.0>",
       reds_diff: 38389,
       reductions: 38389,
       state: :waiting
@@ -156,7 +156,7 @@ A.add(%{
       msg_q: 0,
       name: "Etop.init/1",
       percent: 95.7,
-      pid: '<0.449.0>',
+      pid: ~c"<0.449.0>",
       reds_diff: 103_956,
       reductions: 137_331,
       state: :running
@@ -167,7 +167,7 @@ A.add(%{
       msg_q: 0,
       name: ":erlang.apply/2",
       percent: 3.44,
-      pid: '<0.9.0>',
+      pid: ~c"<0.9.0>",
       reds_diff: 3742,
       reductions: 925_206,
       state: :waiting
@@ -178,7 +178,7 @@ A.add(%{
       msg_q: 0,
       name: ":erlang.apply/2",
       percent: 0.55,
-      pid: '<0.49.0>',
+      pid: ~c"<0.49.0>",
       reds_diff: 601,
       reductions: 242_577,
       state: :waiting
@@ -189,7 +189,7 @@ A.add(%{
       msg_q: 0,
       name: ":file_server.init/1",
       percent: 0.11,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 119,
       reductions: 113_043,
       state: :waiting
@@ -200,7 +200,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_dirty_process_signal_handler.",
       percent: 0.03,
-      pid: '<0.3.0>',
+      pid: ~c"<0.3.0>",
       reds_diff: 30,
       reductions: 23429,
       state: :waiting
@@ -211,7 +211,7 @@ A.add(%{
       msg_q: 0,
       name: ":disk_log.init/2",
       percent: 0.0,
-      pid: '<0.79.0>',
+      pid: ~c"<0.79.0>",
       reds_diff: 4,
       reductions: 38393,
       state: :waiting
@@ -222,7 +222,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.46.0>',
+      pid: ~c"<0.46.0>",
       reds_diff: 2,
       reductions: 495,
       state: :waiting
@@ -233,7 +233,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.91.0>',
+      pid: ~c"<0.91.0>",
       reds_diff: 2,
       reductions: 343,
       state: :waiting
@@ -244,7 +244,7 @@ A.add(%{
       msg_q: 0,
       name: "Mix.ProjectStack.-start_link/1-fun-",
       percent: 0.0,
-      pid: '<0.115.0>',
+      pid: ~c"<0.115.0>",
       reds_diff: 2,
       reductions: 4512,
       state: :waiting
@@ -255,7 +255,7 @@ A.add(%{
       msg_q: 0,
       name: ":rpc.init/1",
       percent: 0.0,
-      pid: '<0.51.0>',
+      pid: ~c"<0.51.0>",
       reds_diff: 2,
       reductions: 170,
       state: :waiting
@@ -287,7 +287,7 @@ A.add(%{
       msg_q: 0,
       name: "Etop.init/1",
       percent: 97.94,
-      pid: '<0.449.0>',
+      pid: ~c"<0.449.0>",
       reds_diff: 86335,
       reductions: 223_666,
       state: :running
@@ -298,7 +298,7 @@ A.add(%{
       msg_q: 0,
       name: ":group.server/3",
       percent: 0.92,
-      pid: '<0.64.0>',
+      pid: ~c"<0.64.0>",
       reds_diff: 812,
       reductions: 207_221,
       state: :waiting
@@ -309,7 +309,7 @@ A.add(%{
       msg_q: 0,
       name: ":user_drv.server/2",
       percent: 0.76,
-      pid: '<0.62.0>',
+      pid: ~c"<0.62.0>",
       reds_diff: 671,
       reductions: 172_680,
       state: :waiting
@@ -320,7 +320,7 @@ A.add(%{
       msg_q: 0,
       name: ":file_server.init/1",
       percent: 0.15,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 135,
       reductions: 113_178,
       state: :waiting
@@ -331,7 +331,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_dirty_process_signal_handler.",
       percent: 0.03,
-      pid: '<0.3.0>',
+      pid: ~c"<0.3.0>",
       reds_diff: 26,
       reductions: 23455,
       state: :waiting
@@ -342,7 +342,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.46.0>',
+      pid: ~c"<0.46.0>",
       reds_diff: 2,
       reductions: 497,
       state: :waiting
@@ -353,7 +353,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.91.0>',
+      pid: ~c"<0.91.0>",
       reds_diff: 2,
       reductions: 345,
       state: :waiting
@@ -364,7 +364,7 @@ A.add(%{
       msg_q: 0,
       name: "Mix.ProjectStack.-start_link/1-fun-",
       percent: 0.0,
-      pid: '<0.115.0>',
+      pid: ~c"<0.115.0>",
       reds_diff: 2,
       reductions: 4514,
       state: :waiting
@@ -375,7 +375,7 @@ A.add(%{
       msg_q: 0,
       name: ":rpc.init/1",
       percent: 0.0,
-      pid: '<0.51.0>',
+      pid: ~c"<0.51.0>",
       reds_diff: 2,
       reductions: 172,
       state: :waiting
@@ -386,7 +386,7 @@ A.add(%{
       msg_q: 0,
       name: "Logger.Watcher.init/1",
       percent: 0.0,
-      pid: '<0.219.0>',
+      pid: ~c"<0.219.0>",
       reds_diff: 2,
       reductions: 101,
       state: :waiting
@@ -418,7 +418,7 @@ A.add(%{
       msg_q: 0,
       name: "Etop.init/1",
       percent: 98.36,
-      pid: '<0.449.0>',
+      pid: ~c"<0.449.0>",
       reds_diff: 46640,
       reductions: 270_306,
       state: :running
@@ -429,7 +429,7 @@ A.add(%{
       msg_q: 0,
       name: ":user_drv.server/2",
       percent: 0.52,
-      pid: '<0.62.0>',
+      pid: ~c"<0.62.0>",
       reds_diff: 247,
       reductions: 172_927,
       state: :waiting
@@ -440,7 +440,7 @@ A.add(%{
       msg_q: 0,
       name: ":group.server/3",
       percent: 0.4,
-      pid: '<0.64.0>',
+      pid: ~c"<0.64.0>",
       reds_diff: 189,
       reductions: 207_410,
       state: :waiting
@@ -451,7 +451,7 @@ A.add(%{
       msg_q: 0,
       name: ":file_server.init/1",
       percent: 0.28,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 135,
       reductions: 113_313,
       state: :waiting
@@ -462,7 +462,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_dirty_process_signal_handler.",
       percent: 0.07,
-      pid: '<0.3.0>',
+      pid: ~c"<0.3.0>",
       reds_diff: 32,
       reductions: 23487,
       state: :waiting
@@ -473,7 +473,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.46.0>',
+      pid: ~c"<0.46.0>",
       reds_diff: 2,
       reductions: 499,
       state: :waiting
@@ -484,7 +484,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.91.0>',
+      pid: ~c"<0.91.0>",
       reds_diff: 2,
       reductions: 347,
       state: :waiting
@@ -495,7 +495,7 @@ A.add(%{
       msg_q: 0,
       name: "Mix.ProjectStack.-start_link/1-fun-",
       percent: 0.0,
-      pid: '<0.115.0>',
+      pid: ~c"<0.115.0>",
       reds_diff: 2,
       reductions: 4516,
       state: :waiting
@@ -506,7 +506,7 @@ A.add(%{
       msg_q: 0,
       name: ":rpc.init/1",
       percent: 0.0,
-      pid: '<0.51.0>',
+      pid: ~c"<0.51.0>",
       reds_diff: 2,
       reductions: 174,
       state: :waiting
@@ -517,7 +517,7 @@ A.add(%{
       msg_q: 0,
       name: "Logger.Watcher.init/1",
       percent: 0.0,
-      pid: '<0.219.0>',
+      pid: ~c"<0.219.0>",
       reds_diff: 2,
       reductions: 103,
       state: :waiting
@@ -549,7 +549,7 @@ A.add(%{
       msg_q: 0,
       name: "Etop.init/1",
       percent: 97.47,
-      pid: '<0.449.0>',
+      pid: ~c"<0.449.0>",
       reds_diff: 102_903,
       reductions: 373_209,
       state: :running
@@ -560,7 +560,7 @@ A.add(%{
       msg_q: 0,
       name: "IEx.Evaluator.init/4",
       percent: 0.95,
-      pid: '<0.226.0>',
+      pid: ~c"<0.226.0>",
       reds_diff: 1007,
       reductions: 876_954,
       state: :waiting
@@ -571,7 +571,7 @@ A.add(%{
       msg_q: 0,
       name: ":erlang.apply/2",
       percent: 0.31,
-      pid: '<0.455.0>',
+      pid: ~c"<0.455.0>",
       reds_diff: 322,
       reductions: 322,
       state: :waiting
@@ -582,7 +582,7 @@ A.add(%{
       msg_q: 0,
       name: ":erlang.apply/2",
       percent: 0.25,
-      pid: '<0.458.0>',
+      pid: ~c"<0.458.0>",
       reds_diff: 268,
       reductions: 268,
       state: :waiting
@@ -593,7 +593,7 @@ A.add(%{
       msg_q: 0,
       name: ":gen_event.init_it/6",
       percent: 0.18,
-      pid: '<0.218.0>',
+      pid: ~c"<0.218.0>",
       reds_diff: 189,
       reductions: 1279,
       state: :waiting
@@ -604,7 +604,7 @@ A.add(%{
       msg_q: 0,
       name: ":user_drv.server/2",
       percent: 0.18,
-      pid: '<0.62.0>',
+      pid: ~c"<0.62.0>",
       reds_diff: 185,
       reductions: 173_112,
       state: :waiting
@@ -615,7 +615,7 @@ A.add(%{
       msg_q: 0,
       name: ":file_server.init/1",
       percent: 0.17,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 184,
       reductions: 113_497,
       state: :waiting
@@ -626,7 +626,7 @@ A.add(%{
       msg_q: 0,
       name: ":group.server/3",
       percent: 0.14,
-      pid: '<0.64.0>',
+      pid: ~c"<0.64.0>",
       reds_diff: 148,
       reductions: 207_558,
       state: :waiting
@@ -637,7 +637,7 @@ A.add(%{
       msg_q: 0,
       name: ":disk_log.init/2",
       percent: 0.08,
-      pid: '<0.79.0>',
+      pid: ~c"<0.79.0>",
       reds_diff: 80,
       reductions: 38477,
       state: :waiting
@@ -648,7 +648,7 @@ A.add(%{
       msg_q: 0,
       name: ":erlang.apply/2",
       percent: 0.03,
-      pid: '<0.456.0>',
+      pid: ~c"<0.456.0>",
       reds_diff: 33,
       reductions: 33,
       state: :waiting
@@ -680,7 +680,7 @@ A.add(%{
       msg_q: 0,
       name: "Etop.init/1",
       percent: 90.47,
-      pid: '<0.449.0>',
+      pid: ~c"<0.449.0>",
       reds_diff: 46140,
       reductions: 419_349,
       state: :running
@@ -691,7 +691,7 @@ A.add(%{
       msg_q: 0,
       name: ":erlang.apply/2",
       percent: 7.44,
-      pid: '<0.455.0>',
+      pid: ~c"<0.455.0>",
       reds_diff: 3796,
       reductions: 4118,
       state: :waiting
@@ -702,7 +702,7 @@ A.add(%{
       msg_q: 0,
       name: ":user_drv.server/2",
       percent: 1.18,
-      pid: '<0.62.0>',
+      pid: ~c"<0.62.0>",
       reds_diff: 604,
       reductions: 173_716,
       state: :waiting
@@ -713,7 +713,7 @@ A.add(%{
       msg_q: 0,
       name: ":file_server.init/1",
       percent: 0.35,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 181,
       reductions: 113_678,
       state: :waiting
@@ -724,7 +724,7 @@ A.add(%{
       msg_q: 0,
       name: ":erlang.apply/2",
       percent: 0.16,
-      pid: '<0.456.0>',
+      pid: ~c"<0.456.0>",
       reds_diff: 82,
       reductions: 115,
       state: :waiting
@@ -735,7 +735,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_dirty_process_signal_handler.",
       percent: 0.05,
-      pid: '<0.3.0>',
+      pid: ~c"<0.3.0>",
       reds_diff: 28,
       reductions: 23541,
       state: :waiting
@@ -746,7 +746,7 @@ A.add(%{
       msg_q: 0,
       name: ":disk_log.init/2",
       percent: 0.01,
-      pid: '<0.79.0>',
+      pid: ~c"<0.79.0>",
       reds_diff: 4,
       reductions: 38481,
       state: :waiting
@@ -757,7 +757,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.46.0>',
+      pid: ~c"<0.46.0>",
       reds_diff: 2,
       reductions: 503,
       state: :waiting
@@ -768,7 +768,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.91.0>',
+      pid: ~c"<0.91.0>",
       reds_diff: 2,
       reductions: 351,
       state: :waiting
@@ -779,7 +779,7 @@ A.add(%{
       msg_q: 0,
       name: "Mix.ProjectStack.-start_link/1-fun-",
       percent: 0.0,
-      pid: '<0.115.0>',
+      pid: ~c"<0.115.0>",
       reds_diff: 2,
       reductions: 4520,
       state: :waiting
@@ -811,7 +811,7 @@ A.add(%{
       msg_q: 0,
       name: "Etop.init/1",
       percent: 90.99,
-      pid: '<0.449.0>',
+      pid: ~c"<0.449.0>",
       reds_diff: 47107,
       reductions: 466_456,
       state: :running
@@ -822,7 +822,7 @@ A.add(%{
       msg_q: 0,
       name: ":erlang.apply/2",
       percent: 7.3,
-      pid: '<0.455.0>',
+      pid: ~c"<0.455.0>",
       reds_diff: 3777,
       reductions: 7895,
       state: :waiting
@@ -833,7 +833,7 @@ A.add(%{
       msg_q: 0,
       name: ":user_drv.server/2",
       percent: 0.63,
-      pid: '<0.62.0>',
+      pid: ~c"<0.62.0>",
       reds_diff: 324,
       reductions: 174_040,
       state: :waiting
@@ -844,7 +844,7 @@ A.add(%{
       msg_q: 0,
       name: ":file_server.init/1",
       percent: 0.35,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 181,
       reductions: 113_859,
       state: :waiting
@@ -855,7 +855,7 @@ A.add(%{
       msg_q: 0,
       name: ":group.server/3",
       percent: 0.19,
-      pid: '<0.64.0>',
+      pid: ~c"<0.64.0>",
       reds_diff: 96,
       reductions: 207_650,
       state: :waiting
@@ -866,7 +866,7 @@ A.add(%{
       msg_q: 0,
       name: ":erlang.apply/2",
       percent: 0.17,
-      pid: '<0.456.0>',
+      pid: ~c"<0.456.0>",
       reds_diff: 86,
       reductions: 201,
       state: :waiting
@@ -877,7 +877,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_dirty_process_signal_handler.",
       percent: 0.05,
-      pid: '<0.3.0>',
+      pid: ~c"<0.3.0>",
       reds_diff: 28,
       reductions: 23569,
       state: :waiting
@@ -888,7 +888,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.46.0>',
+      pid: ~c"<0.46.0>",
       reds_diff: 2,
       reductions: 505,
       state: :waiting
@@ -899,7 +899,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.91.0>',
+      pid: ~c"<0.91.0>",
       reds_diff: 2,
       reductions: 353,
       state: :waiting
@@ -910,7 +910,7 @@ A.add(%{
       msg_q: 0,
       name: "Mix.ProjectStack.-start_link/1-fun-",
       percent: 0.0,
-      pid: '<0.115.0>',
+      pid: ~c"<0.115.0>",
       reds_diff: 2,
       reductions: 4522,
       state: :waiting
@@ -942,7 +942,7 @@ A.add(%{
       msg_q: 0,
       name: "Etop.init/1",
       percent: 95.72,
-      pid: '<0.449.0>',
+      pid: ~c"<0.449.0>",
       reds_diff: 101_815,
       reductions: 568_271,
       state: :running
@@ -953,7 +953,7 @@ A.add(%{
       msg_q: 0,
       name: ":erlang.apply/2",
       percent: 3.41,
-      pid: '<0.455.0>',
+      pid: ~c"<0.455.0>",
       reds_diff: 3631,
       reductions: 11526,
       state: :waiting
@@ -964,7 +964,7 @@ A.add(%{
       msg_q: 0,
       name: ":user_drv.server/2",
       percent: 0.3,
-      pid: '<0.62.0>',
+      pid: ~c"<0.62.0>",
       reds_diff: 324,
       reductions: 174_364,
       state: :waiting
@@ -975,7 +975,7 @@ A.add(%{
       msg_q: 0,
       name: ":file_server.init/1",
       percent: 0.17,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 181,
       reductions: 114_040,
       state: :waiting
@@ -986,7 +986,7 @@ A.add(%{
       msg_q: 0,
       name: ":group.server/3",
       percent: 0.09,
-      pid: '<0.64.0>',
+      pid: ~c"<0.64.0>",
       reds_diff: 96,
       reductions: 207_746,
       state: :waiting
@@ -997,7 +997,7 @@ A.add(%{
       msg_q: 0,
       name: ":erlang.apply/2",
       percent: 0.08,
-      pid: '<0.456.0>',
+      pid: ~c"<0.456.0>",
       reds_diff: 82,
       reductions: 283,
       state: :waiting
@@ -1008,7 +1008,7 @@ A.add(%{
       msg_q: 0,
       name: ":ssl_pem_cache.init/1",
       percent: 0.04,
-      pid: '<0.127.0>',
+      pid: ~c"<0.127.0>",
       reds_diff: 43,
       reductions: 259,
       state: :waiting
@@ -1019,7 +1019,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_dirty_process_signal_handler.",
       percent: 0.03,
-      pid: '<0.3.0>',
+      pid: ~c"<0.3.0>",
       reds_diff: 28,
       reductions: 23597,
       state: :waiting
@@ -1030,7 +1030,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.46.0>',
+      pid: ~c"<0.46.0>",
       reds_diff: 2,
       reductions: 507,
       state: :waiting
@@ -1041,7 +1041,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.91.0>',
+      pid: ~c"<0.91.0>",
       reds_diff: 2,
       reductions: 355,
       state: :waiting
@@ -1073,7 +1073,7 @@ A.add(%{
       msg_q: 0,
       name: "Etop.init/1",
       percent: 90.94,
-      pid: '<0.449.0>',
+      pid: ~c"<0.449.0>",
       reds_diff: 46939,
       reductions: 615_210,
       state: :running
@@ -1084,7 +1084,7 @@ A.add(%{
       msg_q: 0,
       name: ":erlang.apply/2",
       percent: 7.33,
-      pid: '<0.455.0>',
+      pid: ~c"<0.455.0>",
       reds_diff: 3782,
       reductions: 15308,
       state: :waiting
@@ -1095,7 +1095,7 @@ A.add(%{
       msg_q: 0,
       name: ":user_drv.server/2",
       percent: 0.63,
-      pid: '<0.62.0>',
+      pid: ~c"<0.62.0>",
       reds_diff: 324,
       reductions: 174_688,
       state: :waiting
@@ -1106,7 +1106,7 @@ A.add(%{
       msg_q: 0,
       name: ":file_server.init/1",
       percent: 0.35,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 181,
       reductions: 114_221,
       state: :waiting
@@ -1117,7 +1117,7 @@ A.add(%{
       msg_q: 0,
       name: ":group.server/3",
       percent: 0.19,
-      pid: '<0.64.0>',
+      pid: ~c"<0.64.0>",
       reds_diff: 96,
       reductions: 207_842,
       state: :waiting
@@ -1128,7 +1128,7 @@ A.add(%{
       msg_q: 0,
       name: ":erlang.apply/2",
       percent: 0.17,
-      pid: '<0.456.0>',
+      pid: ~c"<0.456.0>",
       reds_diff: 89,
       reductions: 372,
       state: :waiting
@@ -1139,7 +1139,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_dirty_process_signal_handler.",
       percent: 0.05,
-      pid: '<0.3.0>',
+      pid: ~c"<0.3.0>",
       reds_diff: 28,
       reductions: 23625,
       state: :waiting
@@ -1150,7 +1150,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.46.0>',
+      pid: ~c"<0.46.0>",
       reds_diff: 2,
       reductions: 509,
       state: :waiting
@@ -1161,7 +1161,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.91.0>',
+      pid: ~c"<0.91.0>",
       reds_diff: 2,
       reductions: 357,
       state: :waiting
@@ -1172,7 +1172,7 @@ A.add(%{
       msg_q: 0,
       name: "Mix.ProjectStack.-start_link/1-fun-",
       percent: 0.0,
-      pid: '<0.115.0>',
+      pid: ~c"<0.115.0>",
       reds_diff: 2,
       reductions: 4526,
       state: :waiting
@@ -1204,7 +1204,7 @@ A.add(%{
       msg_q: 0,
       name: "Etop.init/1",
       percent: 91.19,
-      pid: '<0.449.0>',
+      pid: ~c"<0.449.0>",
       reds_diff: 46929,
       reductions: 662_139,
       state: :running
@@ -1215,7 +1215,7 @@ A.add(%{
       msg_q: 0,
       name: ":erlang.apply/2",
       percent: 7.25,
-      pid: '<0.455.0>',
+      pid: ~c"<0.455.0>",
       reds_diff: 3731,
       reductions: 19039,
       state: :waiting
@@ -1226,7 +1226,7 @@ A.add(%{
       msg_q: 0,
       name: ":user_drv.server/2",
       percent: 0.63,
-      pid: '<0.62.0>',
+      pid: ~c"<0.62.0>",
       reds_diff: 324,
       reductions: 175_012,
       state: :waiting
@@ -1237,7 +1237,7 @@ A.add(%{
       msg_q: 0,
       name: ":file_server.init/1",
       percent: 0.35,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 181,
       reductions: 114_402,
       state: :waiting
@@ -1248,7 +1248,7 @@ A.add(%{
       msg_q: 0,
       name: ":group.server/3",
       percent: 0.19,
-      pid: '<0.64.0>',
+      pid: ~c"<0.64.0>",
       reds_diff: 96,
       reductions: 207_938,
       state: :waiting
@@ -1259,7 +1259,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_dirty_process_signal_handler.",
       percent: 0.05,
-      pid: '<0.3.0>',
+      pid: ~c"<0.3.0>",
       reds_diff: 28,
       reductions: 23653,
       state: :waiting
@@ -1270,7 +1270,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.46.0>',
+      pid: ~c"<0.46.0>",
       reds_diff: 2,
       reductions: 511,
       state: :waiting
@@ -1281,7 +1281,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.91.0>',
+      pid: ~c"<0.91.0>",
       reds_diff: 2,
       reductions: 359,
       state: :waiting
@@ -1292,7 +1292,7 @@ A.add(%{
       msg_q: 0,
       name: "Mix.ProjectStack.-start_link/1-fun-",
       percent: 0.0,
-      pid: '<0.115.0>',
+      pid: ~c"<0.115.0>",
       reds_diff: 2,
       reductions: 4528,
       state: :waiting
@@ -1303,7 +1303,7 @@ A.add(%{
       msg_q: 0,
       name: ":rpc.init/1",
       percent: 0.0,
-      pid: '<0.51.0>',
+      pid: ~c"<0.51.0>",
       reds_diff: 2,
       reductions: 186,
       state: :waiting
@@ -1335,7 +1335,7 @@ A.add(%{
       msg_q: 0,
       name: "Etop.init/1",
       percent: 92.08,
-      pid: '<0.449.0>',
+      pid: ~c"<0.449.0>",
       reds_diff: 46838,
       reductions: 708_977,
       state: :running
@@ -1346,7 +1346,7 @@ A.add(%{
       msg_q: 0,
       name: ":erlang.apply/2",
       percent: 6.32,
-      pid: '<0.455.0>',
+      pid: ~c"<0.455.0>",
       reds_diff: 3217,
       reductions: 22256,
       state: :waiting
@@ -1357,7 +1357,7 @@ A.add(%{
       msg_q: 0,
       name: ":user_drv.server/2",
       percent: 0.64,
-      pid: '<0.62.0>',
+      pid: ~c"<0.62.0>",
       reds_diff: 324,
       reductions: 175_336,
       state: :waiting
@@ -1368,7 +1368,7 @@ A.add(%{
       msg_q: 0,
       name: ":file_server.init/1",
       percent: 0.36,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 183,
       reductions: 114_585,
       state: :waiting
@@ -1379,7 +1379,7 @@ A.add(%{
       msg_q: 0,
       name: ":group.server/3",
       percent: 0.19,
-      pid: '<0.64.0>',
+      pid: ~c"<0.64.0>",
       reds_diff: 96,
       reductions: 208_034,
       state: :waiting
@@ -1390,7 +1390,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_dirty_process_signal_handler.",
       percent: 0.06,
-      pid: '<0.3.0>',
+      pid: ~c"<0.3.0>",
       reds_diff: 32,
       reductions: 23685,
       state: :waiting
@@ -1401,7 +1401,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.46.0>',
+      pid: ~c"<0.46.0>",
       reds_diff: 2,
       reductions: 513,
       state: :waiting
@@ -1412,7 +1412,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.91.0>',
+      pid: ~c"<0.91.0>",
       reds_diff: 2,
       reductions: 361,
       state: :waiting
@@ -1423,7 +1423,7 @@ A.add(%{
       msg_q: 0,
       name: "Mix.ProjectStack.-start_link/1-fun-",
       percent: 0.0,
-      pid: '<0.115.0>',
+      pid: ~c"<0.115.0>",
       reds_diff: 2,
       reductions: 4530,
       state: :waiting
@@ -1434,7 +1434,7 @@ A.add(%{
       msg_q: 0,
       name: ":rpc.init/1",
       percent: 0.0,
-      pid: '<0.51.0>',
+      pid: ~c"<0.51.0>",
       reds_diff: 2,
       reductions: 188,
       state: :waiting
@@ -1466,7 +1466,7 @@ A.add(%{
       msg_q: 0,
       name: "Etop.init/1",
       percent: 96.1,
-      pid: '<0.449.0>',
+      pid: ~c"<0.449.0>",
       reds_diff: 98951,
       reductions: 807_928,
       state: :running
@@ -1477,7 +1477,7 @@ A.add(%{
       msg_q: 0,
       name: ":erlang.apply/2",
       percent: 3.13,
-      pid: '<0.455.0>',
+      pid: ~c"<0.455.0>",
       reds_diff: 3218,
       reductions: 25474,
       state: :waiting
@@ -1488,7 +1488,7 @@ A.add(%{
       msg_q: 0,
       name: ":user_drv.server/2",
       percent: 0.31,
-      pid: '<0.62.0>',
+      pid: ~c"<0.62.0>",
       reds_diff: 324,
       reductions: 175_660,
       state: :waiting
@@ -1499,7 +1499,7 @@ A.add(%{
       msg_q: 0,
       name: ":file_server.init/1",
       percent: 0.18,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 181,
       reductions: 114_766,
       state: :waiting
@@ -1510,7 +1510,7 @@ A.add(%{
       msg_q: 0,
       name: ":group.server/3",
       percent: 0.09,
-      pid: '<0.64.0>',
+      pid: ~c"<0.64.0>",
       reds_diff: 96,
       reductions: 208_130,
       state: :waiting
@@ -1521,7 +1521,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_dirty_process_signal_handler.",
       percent: 0.03,
-      pid: '<0.3.0>',
+      pid: ~c"<0.3.0>",
       reds_diff: 26,
       reductions: 23711,
       state: :waiting
@@ -1532,7 +1532,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.46.0>',
+      pid: ~c"<0.46.0>",
       reds_diff: 2,
       reductions: 515,
       state: :waiting
@@ -1543,7 +1543,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.91.0>',
+      pid: ~c"<0.91.0>",
       reds_diff: 2,
       reductions: 363,
       state: :waiting
@@ -1554,7 +1554,7 @@ A.add(%{
       msg_q: 0,
       name: "Mix.ProjectStack.-start_link/1-fun-",
       percent: 0.0,
-      pid: '<0.115.0>',
+      pid: ~c"<0.115.0>",
       reds_diff: 2,
       reductions: 4532,
       state: :waiting
@@ -1565,7 +1565,7 @@ A.add(%{
       msg_q: 0,
       name: ":rpc.init/1",
       percent: 0.0,
-      pid: '<0.51.0>',
+      pid: ~c"<0.51.0>",
       reds_diff: 2,
       reductions: 190,
       state: :waiting
@@ -1597,7 +1597,7 @@ A.add(%{
       msg_q: 0,
       name: "Etop.init/1",
       percent: 91.4,
-      pid: '<0.449.0>',
+      pid: ~c"<0.449.0>",
       reds_diff: 46717,
       reductions: 854_645,
       state: :running
@@ -1608,7 +1608,7 @@ A.add(%{
       msg_q: 0,
       name: ":erlang.apply/2",
       percent: 7.0,
-      pid: '<0.455.0>',
+      pid: ~c"<0.455.0>",
       reds_diff: 3580,
       reductions: 29054,
       state: :waiting
@@ -1619,7 +1619,7 @@ A.add(%{
       msg_q: 0,
       name: ":user_drv.server/2",
       percent: 0.66,
-      pid: '<0.62.0>',
+      pid: ~c"<0.62.0>",
       reds_diff: 338,
       reductions: 175_998,
       state: :waiting
@@ -1630,7 +1630,7 @@ A.add(%{
       msg_q: 0,
       name: ":file_server.init/1",
       percent: 0.35,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 181,
       reductions: 114_947,
       state: :waiting
@@ -1641,7 +1641,7 @@ A.add(%{
       msg_q: 0,
       name: ":group.server/3",
       percent: 0.19,
-      pid: '<0.64.0>',
+      pid: ~c"<0.64.0>",
       reds_diff: 96,
       reductions: 208_226,
       state: :waiting
@@ -1652,7 +1652,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_dirty_process_signal_handler.",
       percent: 0.05,
-      pid: '<0.3.0>',
+      pid: ~c"<0.3.0>",
       reds_diff: 28,
       reductions: 23739,
       state: :waiting
@@ -1663,7 +1663,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.46.0>',
+      pid: ~c"<0.46.0>",
       reds_diff: 2,
       reductions: 517,
       state: :waiting
@@ -1674,7 +1674,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.91.0>',
+      pid: ~c"<0.91.0>",
       reds_diff: 2,
       reductions: 365,
       state: :waiting
@@ -1685,7 +1685,7 @@ A.add(%{
       msg_q: 0,
       name: "Mix.ProjectStack.-start_link/1-fun-",
       percent: 0.0,
-      pid: '<0.115.0>',
+      pid: ~c"<0.115.0>",
       reds_diff: 2,
       reductions: 4534,
       state: :waiting
@@ -1696,7 +1696,7 @@ A.add(%{
       msg_q: 0,
       name: ":rpc.init/1",
       percent: 0.0,
-      pid: '<0.51.0>',
+      pid: ~c"<0.51.0>",
       reds_diff: 2,
       reductions: 192,
       state: :waiting
@@ -1728,7 +1728,7 @@ A.add(%{
       msg_q: 0,
       name: "Etop.init/1",
       percent: 91.95,
-      pid: '<0.449.0>',
+      pid: ~c"<0.449.0>",
       reds_diff: 46661,
       reductions: 901_306,
       state: :running
@@ -1739,7 +1739,7 @@ A.add(%{
       msg_q: 0,
       name: ":erlang.apply/2",
       percent: 6.48,
-      pid: '<0.455.0>',
+      pid: ~c"<0.455.0>",
       reds_diff: 3288,
       reductions: 32342,
       state: :waiting
@@ -1750,7 +1750,7 @@ A.add(%{
       msg_q: 0,
       name: ":user_drv.server/2",
       percent: 0.62,
-      pid: '<0.62.0>',
+      pid: ~c"<0.62.0>",
       reds_diff: 317,
       reductions: 176_315,
       state: :waiting
@@ -1761,7 +1761,7 @@ A.add(%{
       msg_q: 0,
       name: ":file_server.init/1",
       percent: 0.36,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 181,
       reductions: 115_128,
       state: :waiting
@@ -1772,7 +1772,7 @@ A.add(%{
       msg_q: 0,
       name: ":group.server/3",
       percent: 0.19,
-      pid: '<0.64.0>',
+      pid: ~c"<0.64.0>",
       reds_diff: 96,
       reductions: 208_322,
       state: :waiting
@@ -1783,7 +1783,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_dirty_process_signal_handler.",
       percent: 0.06,
-      pid: '<0.3.0>',
+      pid: ~c"<0.3.0>",
       reds_diff: 28,
       reductions: 23767,
       state: :waiting
@@ -1794,7 +1794,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.46.0>',
+      pid: ~c"<0.46.0>",
       reds_diff: 2,
       reductions: 519,
       state: :waiting
@@ -1805,7 +1805,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.91.0>',
+      pid: ~c"<0.91.0>",
       reds_diff: 2,
       reductions: 367,
       state: :waiting
@@ -1816,7 +1816,7 @@ A.add(%{
       msg_q: 0,
       name: "Mix.ProjectStack.-start_link/1-fun-",
       percent: 0.0,
-      pid: '<0.115.0>',
+      pid: ~c"<0.115.0>",
       reds_diff: 2,
       reductions: 4536,
       state: :waiting
@@ -1827,7 +1827,7 @@ A.add(%{
       msg_q: 0,
       name: ":rpc.init/1",
       percent: 0.0,
-      pid: '<0.51.0>',
+      pid: ~c"<0.51.0>",
       reds_diff: 2,
       reductions: 194,
       state: :waiting
@@ -1859,7 +1859,7 @@ A.add(%{
       msg_q: 0,
       name: "Etop.init/1",
       percent: 98.32,
-      pid: '<0.449.0>',
+      pid: ~c"<0.449.0>",
       reds_diff: 46854,
       reductions: 948_160,
       state: :running
@@ -1870,7 +1870,7 @@ A.add(%{
       msg_q: 0,
       name: ":user_drv.server/2",
       percent: 0.68,
-      pid: '<0.62.0>',
+      pid: ~c"<0.62.0>",
       reds_diff: 324,
       reductions: 176_639,
       state: :waiting
@@ -1881,7 +1881,7 @@ A.add(%{
       msg_q: 0,
       name: ":file_server.init/1",
       percent: 0.38,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 181,
       reductions: 115_309,
       state: :waiting
@@ -1892,7 +1892,7 @@ A.add(%{
       msg_q: 0,
       name: ":group.server/3",
       percent: 0.2,
-      pid: '<0.64.0>',
+      pid: ~c"<0.64.0>",
       reds_diff: 96,
       reductions: 208_418,
       state: :waiting
@@ -1903,7 +1903,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_dirty_process_signal_handler.",
       percent: 0.06,
-      pid: '<0.3.0>',
+      pid: ~c"<0.3.0>",
       reds_diff: 28,
       reductions: 23795,
       state: :waiting
@@ -1914,7 +1914,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.46.0>',
+      pid: ~c"<0.46.0>",
       reds_diff: 2,
       reductions: 521,
       state: :waiting
@@ -1925,7 +1925,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.91.0>',
+      pid: ~c"<0.91.0>",
       reds_diff: 2,
       reductions: 369,
       state: :waiting
@@ -1936,7 +1936,7 @@ A.add(%{
       msg_q: 0,
       name: "Mix.ProjectStack.-start_link/1-fun-",
       percent: 0.0,
-      pid: '<0.115.0>',
+      pid: ~c"<0.115.0>",
       reds_diff: 2,
       reductions: 4538,
       state: :waiting
@@ -1947,7 +1947,7 @@ A.add(%{
       msg_q: 0,
       name: ":rpc.init/1",
       percent: 0.0,
-      pid: '<0.51.0>',
+      pid: ~c"<0.51.0>",
       reds_diff: 2,
       reductions: 196,
       state: :waiting
@@ -1958,7 +1958,7 @@ A.add(%{
       msg_q: 0,
       name: "Logger.Watcher.init/1",
       percent: 0.0,
-      pid: '<0.219.0>',
+      pid: ~c"<0.219.0>",
       reds_diff: 2,
       reductions: 125,
       state: :waiting
@@ -1990,7 +1990,7 @@ A.add(%{
       msg_q: 0,
       name: "Etop.init/1",
       percent: 99.28,
-      pid: '<0.449.0>',
+      pid: ~c"<0.449.0>",
       reds_diff: 46493,
       reductions: 994_653,
       state: :running
@@ -2001,7 +2001,7 @@ A.add(%{
       msg_q: 0,
       name: ":file_server.init/1",
       percent: 0.28,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 132,
       reductions: 115_441,
       state: :waiting
@@ -2012,7 +2012,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_dirty_process_signal_handler.",
       percent: 0.06,
-      pid: '<0.3.0>',
+      pid: ~c"<0.3.0>",
       reds_diff: 28,
       reductions: 23823,
       state: :waiting
@@ -2023,7 +2023,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.46.0>',
+      pid: ~c"<0.46.0>",
       reds_diff: 2,
       reductions: 523,
       state: :waiting
@@ -2034,7 +2034,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.91.0>',
+      pid: ~c"<0.91.0>",
       reds_diff: 2,
       reductions: 371,
       state: :waiting
@@ -2045,7 +2045,7 @@ A.add(%{
       msg_q: 0,
       name: "Mix.ProjectStack.-start_link/1-fun-",
       percent: 0.0,
-      pid: '<0.115.0>',
+      pid: ~c"<0.115.0>",
       reds_diff: 2,
       reductions: 4540,
       state: :waiting
@@ -2056,7 +2056,7 @@ A.add(%{
       msg_q: 0,
       name: ":rpc.init/1",
       percent: 0.0,
-      pid: '<0.51.0>',
+      pid: ~c"<0.51.0>",
       reds_diff: 2,
       reductions: 198,
       state: :waiting
@@ -2067,7 +2067,7 @@ A.add(%{
       msg_q: 0,
       name: "Logger.Watcher.init/1",
       percent: 0.0,
-      pid: '<0.219.0>',
+      pid: ~c"<0.219.0>",
       reds_diff: 2,
       reductions: 127,
       state: :waiting
@@ -2078,7 +2078,7 @@ A.add(%{
       msg_q: 0,
       name: ":user_drv.server/2",
       percent: 0.0,
-      pid: '<0.62.0>',
+      pid: ~c"<0.62.0>",
       reds_diff: 2,
       reductions: 176_641,
       state: :waiting
@@ -2089,7 +2089,7 @@ A.add(%{
       msg_q: 0,
       name: ":supervisor.ssl_admin_sup/1",
       percent: 0.0,
-      pid: '<0.126.0>',
+      pid: ~c"<0.126.0>",
       reds_diff: 2,
       reductions: 735,
       state: :waiting
@@ -2121,7 +2121,7 @@ A.add(%{
       msg_q: 0,
       name: "Etop.init/1",
       percent: 99.24,
-      pid: '<0.449.0>',
+      pid: ~c"<0.449.0>",
       reds_diff: 46388,
       reductions: 1_041_041,
       state: :running
@@ -2132,7 +2132,7 @@ A.add(%{
       msg_q: 0,
       name: ":file_server.init/1",
       percent: 0.29,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 135,
       reductions: 115_576,
       state: :waiting
@@ -2143,7 +2143,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_dirty_process_signal_handler.",
       percent: 0.09,
-      pid: '<0.3.0>',
+      pid: ~c"<0.3.0>",
       reds_diff: 44,
       reductions: 23867,
       state: :waiting
@@ -2154,7 +2154,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.46.0>',
+      pid: ~c"<0.46.0>",
       reds_diff: 2,
       reductions: 525,
       state: :waiting
@@ -2165,7 +2165,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.91.0>',
+      pid: ~c"<0.91.0>",
       reds_diff: 2,
       reductions: 373,
       state: :waiting
@@ -2176,7 +2176,7 @@ A.add(%{
       msg_q: 0,
       name: "Mix.ProjectStack.-start_link/1-fun-",
       percent: 0.0,
-      pid: '<0.115.0>',
+      pid: ~c"<0.115.0>",
       reds_diff: 2,
       reductions: 4542,
       state: :waiting
@@ -2187,7 +2187,7 @@ A.add(%{
       msg_q: 0,
       name: ":rpc.init/1",
       percent: 0.0,
-      pid: '<0.51.0>',
+      pid: ~c"<0.51.0>",
       reds_diff: 2,
       reductions: 200,
       state: :waiting
@@ -2198,7 +2198,7 @@ A.add(%{
       msg_q: 0,
       name: "Logger.Watcher.init/1",
       percent: 0.0,
-      pid: '<0.219.0>',
+      pid: ~c"<0.219.0>",
       reds_diff: 2,
       reductions: 129,
       state: :waiting
@@ -2209,7 +2209,7 @@ A.add(%{
       msg_q: 0,
       name: ":user_drv.server/2",
       percent: 0.0,
-      pid: '<0.62.0>',
+      pid: ~c"<0.62.0>",
       reds_diff: 2,
       reductions: 176_643,
       state: :waiting
@@ -2220,7 +2220,7 @@ A.add(%{
       msg_q: 0,
       name: ":supervisor.ssl_admin_sup/1",
       percent: 0.0,
-      pid: '<0.126.0>',
+      pid: ~c"<0.126.0>",
       reds_diff: 2,
       reductions: 737,
       state: :waiting
@@ -2252,7 +2252,7 @@ A.add(%{
       msg_q: 0,
       name: "Etop.init/1",
       percent: 99.65,
-      pid: '<0.449.0>',
+      pid: ~c"<0.449.0>",
       reds_diff: 95843,
       reductions: 1_136_884,
       state: :running
@@ -2263,7 +2263,7 @@ A.add(%{
       msg_q: 0,
       name: ":file_server.init/1",
       percent: 0.14,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 135,
       reductions: 115_711,
       state: :waiting
@@ -2274,7 +2274,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_dirty_process_signal_handler.",
       percent: 0.02,
-      pid: '<0.3.0>',
+      pid: ~c"<0.3.0>",
       reds_diff: 24,
       reductions: 23891,
       state: :waiting
@@ -2285,7 +2285,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.46.0>',
+      pid: ~c"<0.46.0>",
       reds_diff: 2,
       reductions: 527,
       state: :waiting
@@ -2296,7 +2296,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.91.0>',
+      pid: ~c"<0.91.0>",
       reds_diff: 2,
       reductions: 375,
       state: :waiting
@@ -2307,7 +2307,7 @@ A.add(%{
       msg_q: 0,
       name: "Mix.ProjectStack.-start_link/1-fun-",
       percent: 0.0,
-      pid: '<0.115.0>',
+      pid: ~c"<0.115.0>",
       reds_diff: 2,
       reductions: 4544,
       state: :waiting
@@ -2318,7 +2318,7 @@ A.add(%{
       msg_q: 0,
       name: ":rpc.init/1",
       percent: 0.0,
-      pid: '<0.51.0>',
+      pid: ~c"<0.51.0>",
       reds_diff: 2,
       reductions: 202,
       state: :waiting
@@ -2329,7 +2329,7 @@ A.add(%{
       msg_q: 0,
       name: "Logger.Watcher.init/1",
       percent: 0.0,
-      pid: '<0.219.0>',
+      pid: ~c"<0.219.0>",
       reds_diff: 2,
       reductions: 131,
       state: :waiting
@@ -2340,7 +2340,7 @@ A.add(%{
       msg_q: 0,
       name: ":user_drv.server/2",
       percent: 0.0,
-      pid: '<0.62.0>',
+      pid: ~c"<0.62.0>",
       reds_diff: 2,
       reductions: 176_645,
       state: :waiting
@@ -2351,7 +2351,7 @@ A.add(%{
       msg_q: 0,
       name: ":supervisor.ssl_admin_sup/1",
       percent: 0.0,
-      pid: '<0.126.0>',
+      pid: ~c"<0.126.0>",
       reds_diff: 2,
       reductions: 739,
       state: :waiting
@@ -2383,7 +2383,7 @@ A.add(%{
       msg_q: 0,
       name: "Etop.init/1",
       percent: 99.27,
-      pid: '<0.449.0>',
+      pid: ~c"<0.449.0>",
       reds_diff: 46435,
       reductions: 1_183_319,
       state: :running
@@ -2394,7 +2394,7 @@ A.add(%{
       msg_q: 0,
       name: ":file_server.init/1",
       percent: 0.29,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 135,
       reductions: 115_846,
       state: :waiting
@@ -2405,7 +2405,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_dirty_process_signal_handler.",
       percent: 0.06,
-      pid: '<0.3.0>',
+      pid: ~c"<0.3.0>",
       reds_diff: 30,
       reductions: 23921,
       state: :waiting
@@ -2416,7 +2416,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.46.0>',
+      pid: ~c"<0.46.0>",
       reds_diff: 2,
       reductions: 529,
       state: :waiting
@@ -2427,7 +2427,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.91.0>',
+      pid: ~c"<0.91.0>",
       reds_diff: 2,
       reductions: 377,
       state: :waiting
@@ -2438,7 +2438,7 @@ A.add(%{
       msg_q: 0,
       name: "Mix.ProjectStack.-start_link/1-fun-",
       percent: 0.0,
-      pid: '<0.115.0>',
+      pid: ~c"<0.115.0>",
       reds_diff: 2,
       reductions: 4546,
       state: :waiting
@@ -2449,7 +2449,7 @@ A.add(%{
       msg_q: 0,
       name: ":rpc.init/1",
       percent: 0.0,
-      pid: '<0.51.0>',
+      pid: ~c"<0.51.0>",
       reds_diff: 2,
       reductions: 204,
       state: :waiting
@@ -2460,7 +2460,7 @@ A.add(%{
       msg_q: 0,
       name: "Logger.Watcher.init/1",
       percent: 0.0,
-      pid: '<0.219.0>',
+      pid: ~c"<0.219.0>",
       reds_diff: 2,
       reductions: 133,
       state: :waiting
@@ -2471,7 +2471,7 @@ A.add(%{
       msg_q: 0,
       name: ":user_drv.server/2",
       percent: 0.0,
-      pid: '<0.62.0>',
+      pid: ~c"<0.62.0>",
       reds_diff: 2,
       reductions: 176_647,
       state: :waiting
@@ -2482,7 +2482,7 @@ A.add(%{
       msg_q: 0,
       name: ":supervisor.ssl_admin_sup/1",
       percent: 0.0,
-      pid: '<0.126.0>',
+      pid: ~c"<0.126.0>",
       reds_diff: 2,
       reductions: 741,
       state: :waiting
@@ -2514,7 +2514,7 @@ A.add(%{
       msg_q: 0,
       name: "Etop.init/1",
       percent: 99.27,
-      pid: '<0.449.0>',
+      pid: ~c"<0.449.0>",
       reds_diff: 46329,
       reductions: 1_229_648,
       state: :running
@@ -2525,7 +2525,7 @@ A.add(%{
       msg_q: 0,
       name: ":file_server.init/1",
       percent: 0.29,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 135,
       reductions: 115_981,
       state: :waiting
@@ -2536,7 +2536,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_dirty_process_signal_handler.",
       percent: 0.06,
-      pid: '<0.3.0>',
+      pid: ~c"<0.3.0>",
       reds_diff: 26,
       reductions: 23947,
       state: :waiting
@@ -2547,7 +2547,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.46.0>',
+      pid: ~c"<0.46.0>",
       reds_diff: 2,
       reductions: 531,
       state: :waiting
@@ -2558,7 +2558,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.91.0>',
+      pid: ~c"<0.91.0>",
       reds_diff: 2,
       reductions: 379,
       state: :waiting
@@ -2569,7 +2569,7 @@ A.add(%{
       msg_q: 0,
       name: "Mix.ProjectStack.-start_link/1-fun-",
       percent: 0.0,
-      pid: '<0.115.0>',
+      pid: ~c"<0.115.0>",
       reds_diff: 2,
       reductions: 4548,
       state: :waiting
@@ -2580,7 +2580,7 @@ A.add(%{
       msg_q: 0,
       name: ":rpc.init/1",
       percent: 0.0,
-      pid: '<0.51.0>',
+      pid: ~c"<0.51.0>",
       reds_diff: 2,
       reductions: 206,
       state: :waiting
@@ -2591,7 +2591,7 @@ A.add(%{
       msg_q: 0,
       name: "Logger.Watcher.init/1",
       percent: 0.0,
-      pid: '<0.219.0>',
+      pid: ~c"<0.219.0>",
       reds_diff: 2,
       reductions: 135,
       state: :waiting
@@ -2602,7 +2602,7 @@ A.add(%{
       msg_q: 0,
       name: ":user_drv.server/2",
       percent: 0.0,
-      pid: '<0.62.0>',
+      pid: ~c"<0.62.0>",
       reds_diff: 2,
       reductions: 176_649,
       state: :waiting
@@ -2613,7 +2613,7 @@ A.add(%{
       msg_q: 0,
       name: ":supervisor.ssl_admin_sup/1",
       percent: 0.0,
-      pid: '<0.126.0>',
+      pid: ~c"<0.126.0>",
       reds_diff: 2,
       reductions: 743,
       state: :waiting
@@ -2645,7 +2645,7 @@ A.add(%{
       msg_q: 0,
       name: "Etop.init/1",
       percent: 99.69,
-      pid: '<0.449.0>',
+      pid: ~c"<0.449.0>",
       reds_diff: 110_067,
       reductions: 1_339_715,
       state: :running
@@ -2656,7 +2656,7 @@ A.add(%{
       msg_q: 0,
       name: ":file_server.init/1",
       percent: 0.12,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 135,
       reductions: 116_116,
       state: :waiting
@@ -2667,7 +2667,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_dirty_process_signal_handler.",
       percent: 0.03,
-      pid: '<0.3.0>',
+      pid: ~c"<0.3.0>",
       reds_diff: 32,
       reductions: 23979,
       state: :waiting
@@ -2678,7 +2678,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.46.0>',
+      pid: ~c"<0.46.0>",
       reds_diff: 2,
       reductions: 533,
       state: :waiting
@@ -2689,7 +2689,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.91.0>',
+      pid: ~c"<0.91.0>",
       reds_diff: 2,
       reductions: 381,
       state: :waiting
@@ -2700,7 +2700,7 @@ A.add(%{
       msg_q: 0,
       name: "Mix.ProjectStack.-start_link/1-fun-",
       percent: 0.0,
-      pid: '<0.115.0>',
+      pid: ~c"<0.115.0>",
       reds_diff: 2,
       reductions: 4550,
       state: :waiting
@@ -2711,7 +2711,7 @@ A.add(%{
       msg_q: 0,
       name: ":rpc.init/1",
       percent: 0.0,
-      pid: '<0.51.0>',
+      pid: ~c"<0.51.0>",
       reds_diff: 2,
       reductions: 208,
       state: :waiting
@@ -2722,7 +2722,7 @@ A.add(%{
       msg_q: 0,
       name: "Logger.Watcher.init/1",
       percent: 0.0,
-      pid: '<0.219.0>',
+      pid: ~c"<0.219.0>",
       reds_diff: 2,
       reductions: 137,
       state: :waiting
@@ -2733,7 +2733,7 @@ A.add(%{
       msg_q: 0,
       name: ":user_drv.server/2",
       percent: 0.0,
-      pid: '<0.62.0>',
+      pid: ~c"<0.62.0>",
       reds_diff: 2,
       reductions: 176_651,
       state: :waiting
@@ -2744,7 +2744,7 @@ A.add(%{
       msg_q: 0,
       name: ":supervisor.ssl_admin_sup/1",
       percent: 0.0,
-      pid: '<0.126.0>',
+      pid: ~c"<0.126.0>",
       reds_diff: 2,
       reductions: 745,
       state: :waiting
@@ -2776,7 +2776,7 @@ A.add(%{
       msg_q: 0,
       name: "Etop.init/1",
       percent: 99.65,
-      pid: '<0.449.0>',
+      pid: ~c"<0.449.0>",
       reds_diff: 46606,
       reductions: 1_386_321,
       state: :running
@@ -2787,7 +2787,7 @@ A.add(%{
       msg_q: 0,
       name: ":file_server.init/1",
       percent: 0.29,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 135,
       reductions: 116_251,
       state: :waiting
@@ -2798,7 +2798,7 @@ A.add(%{
       msg_q: 0,
       name: ":group.server/3",
       percent: 0.08,
-      pid: '<0.64.0>',
+      pid: ~c"<0.64.0>",
       reds_diff: 36,
       reductions: 208_466,
       state: :waiting
@@ -2809,7 +2809,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_dirty_process_signal_handler.",
       percent: 0.06,
-      pid: '<0.3.0>',
+      pid: ~c"<0.3.0>",
       reds_diff: 26,
       reductions: 24005,
       state: :waiting
@@ -2820,7 +2820,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.46.0>',
+      pid: ~c"<0.46.0>",
       reds_diff: 2,
       reductions: 535,
       state: :waiting
@@ -2831,7 +2831,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.91.0>',
+      pid: ~c"<0.91.0>",
       reds_diff: 2,
       reductions: 383,
       state: :waiting
@@ -2842,7 +2842,7 @@ A.add(%{
       msg_q: 0,
       name: "Mix.ProjectStack.-start_link/1-fun-",
       percent: 0.0,
-      pid: '<0.115.0>',
+      pid: ~c"<0.115.0>",
       reds_diff: 2,
       reductions: 4552,
       state: :waiting
@@ -2853,7 +2853,7 @@ A.add(%{
       msg_q: 0,
       name: ":rpc.init/1",
       percent: 0.0,
-      pid: '<0.51.0>',
+      pid: ~c"<0.51.0>",
       reds_diff: 2,
       reductions: 210,
       state: :waiting
@@ -2864,7 +2864,7 @@ A.add(%{
       msg_q: 0,
       name: "Logger.Watcher.init/1",
       percent: 0.0,
-      pid: '<0.219.0>',
+      pid: ~c"<0.219.0>",
       reds_diff: 2,
       reductions: 139,
       state: :waiting
@@ -2875,7 +2875,7 @@ A.add(%{
       msg_q: 0,
       name: ":supervisor.ssl_admin_sup/1",
       percent: 0.0,
-      pid: '<0.126.0>',
+      pid: ~c"<0.126.0>",
       reds_diff: 2,
       reductions: 747,
       state: :waiting
@@ -2907,7 +2907,7 @@ A.add(%{
       msg_q: 0,
       name: "Etop.init/1",
       percent: 97.3,
-      pid: '<0.449.0>',
+      pid: ~c"<0.449.0>",
       reds_diff: 46630,
       reductions: 1_432_951,
       state: :running
@@ -2918,7 +2918,7 @@ A.add(%{
       msg_q: 0,
       name: ":user_drv.server/2",
       percent: 1.21,
-      pid: '<0.62.0>',
+      pid: ~c"<0.62.0>",
       reds_diff: 578,
       reductions: 177_021,
       state: :waiting
@@ -2929,7 +2929,7 @@ A.add(%{
       msg_q: 0,
       name: ":group.server/3",
       percent: 0.78,
-      pid: '<0.64.0>',
+      pid: ~c"<0.64.0>",
       reds_diff: 376,
       reductions: 208_842,
       state: :waiting
@@ -2940,7 +2940,7 @@ A.add(%{
       msg_q: 0,
       name: ":file_server.init/1",
       percent: 0.28,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 135,
       reductions: 116_386,
       state: :waiting
@@ -2951,7 +2951,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_dirty_process_signal_handler.",
       percent: 0.07,
-      pid: '<0.3.0>',
+      pid: ~c"<0.3.0>",
       reds_diff: 32,
       reductions: 24037,
       state: :waiting
@@ -2962,7 +2962,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.46.0>',
+      pid: ~c"<0.46.0>",
       reds_diff: 2,
       reductions: 537,
       state: :waiting
@@ -2973,7 +2973,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.91.0>',
+      pid: ~c"<0.91.0>",
       reds_diff: 2,
       reductions: 385,
       state: :waiting
@@ -2984,7 +2984,7 @@ A.add(%{
       msg_q: 0,
       name: "Mix.ProjectStack.-start_link/1-fun-",
       percent: 0.0,
-      pid: '<0.115.0>',
+      pid: ~c"<0.115.0>",
       reds_diff: 2,
       reductions: 4554,
       state: :waiting
@@ -2995,7 +2995,7 @@ A.add(%{
       msg_q: 0,
       name: ":rpc.init/1",
       percent: 0.0,
-      pid: '<0.51.0>',
+      pid: ~c"<0.51.0>",
       reds_diff: 2,
       reductions: 212,
       state: :waiting
@@ -3006,7 +3006,7 @@ A.add(%{
       msg_q: 0,
       name: "Logger.Watcher.init/1",
       percent: 0.0,
-      pid: '<0.219.0>',
+      pid: ~c"<0.219.0>",
       reds_diff: 2,
       reductions: 141,
       state: :waiting
@@ -3038,7 +3038,7 @@ A.add(%{
       msg_q: 0,
       name: "Etop.init/1",
       percent: 98.14,
-      pid: '<0.449.0>',
+      pid: ~c"<0.449.0>",
       reds_diff: 46582,
       reductions: 1_479_533,
       state: :running
@@ -3049,7 +3049,7 @@ A.add(%{
       msg_q: 0,
       name: ":user_drv.server/2",
       percent: 0.77,
-      pid: '<0.62.0>',
+      pid: ~c"<0.62.0>",
       reds_diff: 364,
       reductions: 177_385,
       state: :waiting
@@ -3060,7 +3060,7 @@ A.add(%{
       msg_q: 0,
       name: ":group.server/3",
       percent: 0.38,
-      pid: '<0.64.0>',
+      pid: ~c"<0.64.0>",
       reds_diff: 182,
       reductions: 209_024,
       state: :waiting
@@ -3071,7 +3071,7 @@ A.add(%{
       msg_q: 0,
       name: ":file_server.init/1",
       percent: 0.28,
-      pid: '<0.57.0>',
+      pid: ~c"<0.57.0>",
       reds_diff: 135,
       reductions: 116_521,
       state: :waiting
@@ -3082,7 +3082,7 @@ A.add(%{
       msg_q: 0,
       name: ":erts_dirty_process_signal_handler.",
       percent: 0.06,
-      pid: '<0.3.0>',
+      pid: ~c"<0.3.0>",
       reds_diff: 30,
       reductions: 24067,
       state: :waiting
@@ -3093,7 +3093,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.46.0>',
+      pid: ~c"<0.46.0>",
       reds_diff: 2,
       reductions: 539,
       state: :waiting
@@ -3104,7 +3104,7 @@ A.add(%{
       msg_q: 0,
       name: ":application_master.start_it/4",
       percent: 0.0,
-      pid: '<0.91.0>',
+      pid: ~c"<0.91.0>",
       reds_diff: 2,
       reductions: 387,
       state: :waiting
@@ -3115,7 +3115,7 @@ A.add(%{
       msg_q: 0,
       name: "Mix.ProjectStack.-start_link/1-fun-",
       percent: 0.0,
-      pid: '<0.115.0>',
+      pid: ~c"<0.115.0>",
       reds_diff: 2,
       reductions: 4556,
       state: :waiting
@@ -3126,7 +3126,7 @@ A.add(%{
       msg_q: 0,
       name: ":rpc.init/1",
       percent: 0.0,
-      pid: '<0.51.0>',
+      pid: ~c"<0.51.0>",
       reds_diff: 2,
       reductions: 214,
       state: :waiting
@@ -3137,7 +3137,7 @@ A.add(%{
       msg_q: 0,
       name: "Logger.Watcher.init/1",
       percent: 0.0,
-      pid: '<0.219.0>',
+      pid: ~c"<0.219.0>",
       reds_diff: 2,
       reductions: 143,
       state: :waiting

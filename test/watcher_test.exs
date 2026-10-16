@@ -69,7 +69,7 @@ defmodule Etop.WatcherTest do
   end
 
   @tag etop_opts: [reporting: false]
-  @tag opts: [notify_log: true, no_reporting: true]
+  @tag opts: [notify_log: true, no_reporting: true, reporting_enable_limit: 10]
   @tag :start
   test "trigger monitors" do
     refute Etop.status().reporting
@@ -77,8 +77,8 @@ defmodule Etop.WatcherTest do
     capture_io(fn ->
       logs =
         capture_log(fn ->
-          Etop.Utils.create_load()
-          Process.sleep(200)
+          Server.status()
+          Etop.Fixtures.collect_cpu_samples()
         end)
         |> String.split("\n", trim: true)
         |> Enum.filter(&(&1 =~ "[info]"))
@@ -98,6 +98,14 @@ defmodule Etop.WatcherTest do
 
   describe "notify" do
     setup [:setup_state]
+
+    test "supports the warning level and legacy warn alias" do
+      for level <- [:warning, :warn] do
+        assert capture_log(fn ->
+                 Server.notify(%{notify_log: level}, "warning notification")
+               end) =~ "[warning]"
+      end
+    end
 
     @tag opts: [notify_log: true]
     test "notify_disable/3", %{state: state} do

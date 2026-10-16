@@ -1,4 +1,23 @@
 defmodule Etop.Fixtures do
+  def collect_cpu_samples do
+    Etop.pause()
+    samples = Enum.take(proc_stats(), 2)
+    {{stat, process_stat}, _} = hd(samples)
+    os_pid = CpuUtil.getpid()
+
+    send(
+      Etop,
+      {:cpu_info_result,
+       %{cores: {:ok, 6}, os_pid: os_pid, util: {{:ok, stat}, {:ok, process_stat}}}}
+    )
+
+    for {_, current} <- samples do
+      stats = Map.put(Etop.Reader.get_stats(os_pid), :util, current)
+      send(Etop, {:result, stats})
+      Etop.status()
+    end
+  end
+
   def proc_stat1,
     do:
       {"""
@@ -112,7 +131,7 @@ defmodule Etop.Fixtures do
   def procs1,
     do:
       [
-        {pid('<0.0.0>'),
+        {pid(~c"<0.0.0>"),
          [
            memory: {:memory, 26568},
            registered_name: :init,
@@ -120,12 +139,12 @@ defmodule Etop.Fixtures do
            initial_call: {:otp_ring0, :start, 2},
            status: :waiting,
            message_queue_len: 0,
-           links: [pid('<0.9.0>'), pid('<0.41.0>'), pid('<0.43.0>'), pid('<0.8.0>')],
+           links: [pid(~c"<0.9.0>"), pid(~c"<0.41.0>"), pid(~c"<0.43.0>"), pid(~c"<0.8.0>")],
            dictionary: [],
            trap_exit: true,
            error_handler: :error_handler,
            priority: :normal,
-           group_leader: pid('<0.0.0>'),
+           group_leader: pid(~c"<0.0.0>"),
            total_heap_size: 3196,
            heap_size: 1598,
            stack_size: 4,
@@ -139,7 +158,7 @@ defmodule Etop.Fixtures do
            ],
            suspending: []
          ]},
-        {pid('<0.2.0>'),
+        {pid(~c"<0.2.0>"),
          [
            memory: {:memory, 2688},
            current_function: {:erts_literal_area_collector, :msg_loop, 4},
@@ -151,7 +170,7 @@ defmodule Etop.Fixtures do
            trap_exit: true,
            error_handler: :error_handler,
            priority: :normal,
-           group_leader: pid('<0.0.0>'),
+           group_leader: pid(~c"<0.0.0>"),
            total_heap_size: 233,
            heap_size: 233,
            stack_size: 5,
@@ -165,7 +184,7 @@ defmodule Etop.Fixtures do
            ],
            suspending: []
          ]},
-        {pid('<0.6.0>'),
+        {pid(~c"<0.6.0>"),
          [
            memory: {:memory, 2688},
            current_function: {:prim_file, :helper_loop, 0},
@@ -177,7 +196,7 @@ defmodule Etop.Fixtures do
            trap_exit: false,
            error_handler: :error_handler,
            priority: :normal,
-           group_leader: pid('<0.0.0>'),
+           group_leader: pid(~c"<0.0.0>"),
            total_heap_size: 233,
            heap_size: 233,
            stack_size: 1,
@@ -191,19 +210,19 @@ defmodule Etop.Fixtures do
            ],
            suspending: []
          ]},
-        {pid('<0.8.0>'),
+        {pid(~c"<0.8.0>"),
          [
            memory: {:memory, 67888},
            current_function: {Kernel.CLI, :exec_fun, 2},
            initial_call: {:erlang, :apply, 2},
            status: :waiting,
            message_queue_len: 0,
-           links: [pid('<0.0.0>')],
+           links: [pid(~c"<0.0.0>")],
            dictionary: [],
            trap_exit: true,
            error_handler: :error_handler,
            priority: :normal,
-           group_leader: pid('<0.62.0>'),
+           group_leader: pid(~c"<0.62.0>"),
            total_heap_size: 8370,
            heap_size: 1598,
            stack_size: 20,
@@ -224,7 +243,7 @@ defmodule Etop.Fixtures do
   def procs2,
     do:
       [
-        {pid('<0.0.0>'),
+        {pid(~c"<0.0.0>"),
          [
            memory: {:memory, 26570},
            registered_name: :init,
@@ -232,12 +251,12 @@ defmodule Etop.Fixtures do
            initial_call: {:otp_ring0, :start, 2},
            status: :waiting,
            message_queue_len: 0,
-           links: [pid('<0.9.0>'), pid('<0.41.0>'), pid('<0.43.0>'), pid('<0.8.0>')],
+           links: [pid(~c"<0.9.0>"), pid(~c"<0.41.0>"), pid(~c"<0.43.0>"), pid(~c"<0.8.0>")],
            dictionary: [],
            trap_exit: true,
            error_handler: :error_handler,
            priority: :normal,
-           group_leader: pid('<0.0.0>'),
+           group_leader: pid(~c"<0.0.0>"),
            total_heap_size: 3196,
            heap_size: 1598,
            stack_size: 4,
@@ -251,7 +270,7 @@ defmodule Etop.Fixtures do
            ],
            suspending: []
          ]},
-        {pid('<0.2.0>'),
+        {pid(~c"<0.2.0>"),
          [
            memory: {:memory, 2688},
            current_function: {:erts_literal_area_collector, :msg_loop, 4},
@@ -263,7 +282,7 @@ defmodule Etop.Fixtures do
            trap_exit: true,
            error_handler: :error_handler,
            priority: :normal,
-           group_leader: pid('<0.0.0>'),
+           group_leader: pid(~c"<0.0.0>"),
            total_heap_size: 233,
            heap_size: 233,
            stack_size: 5,
@@ -277,7 +296,7 @@ defmodule Etop.Fixtures do
            ],
            suspending: []
          ]},
-        {pid('<0.6.0>'),
+        {pid(~c"<0.6.0>"),
          [
            memory: {:memory, 2688},
            current_function: {:prim_file, :helper_loop, 0},
@@ -289,7 +308,7 @@ defmodule Etop.Fixtures do
            trap_exit: false,
            error_handler: :error_handler,
            priority: :normal,
-           group_leader: pid('<0.0.0>'),
+           group_leader: pid(~c"<0.0.0>"),
            total_heap_size: 233,
            heap_size: 233,
            stack_size: 1,
@@ -303,19 +322,19 @@ defmodule Etop.Fixtures do
            ],
            suspending: []
          ]},
-        {pid('<0.8.0>'),
+        {pid(~c"<0.8.0>"),
          [
            memory: {:memory, 67888},
            current_function: {Kernel.CLI, :exec_fun, 2},
            initial_call: {:erlang, :apply, 2},
            status: :waiting,
            message_queue_len: 0,
-           links: [pid('<0.0.0>')],
+           links: [pid(~c"<0.0.0>")],
            dictionary: [],
            trap_exit: true,
            error_handler: :error_handler,
            priority: :normal,
-           group_leader: pid('<0.62.0>'),
+           group_leader: pid(~c"<0.62.0>"),
            total_heap_size: 8370,
            heap_size: 1598,
            stack_size: 20,

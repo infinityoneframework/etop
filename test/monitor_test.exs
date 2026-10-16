@@ -29,6 +29,35 @@ defmodule Etop.MonitorTest do
   end
 
   describe "summary" do
+    test "missing CPU samples do not trigger numeric thresholds", %{
+      state: state,
+      params: {stats, processes},
+      monitor: monitor
+    } do
+      state = Etop.add_monitor(state, :summary, [:load, :total], 9, monitor)
+
+      for load <- [nil, %{}] do
+        params = {%{stats | load: load}, processes}
+        assert Monitor.run(params, state) == {params, state}
+        previous_missing = put_in(state.stats.load, load)
+
+        assert Monitor.run({stats, processes}, previous_missing) ==
+                 {{stats, processes}, previous_missing}
+      end
+
+      refute_received {:monitor, _, _}
+    end
+
+    test "missing process fields do not trigger numeric thresholds", %{
+      state: state,
+      params: params,
+      monitor: monitor
+    } do
+      state = Etop.add_monitor(state, :process, :unavailable_field, 9, monitor)
+      assert Monitor.run(params, state) == {params, state}
+      refute_received {:monitor, _, _}
+    end
+
     test "no monitors", %{state: state, params: params} do
       assert Monitor.run(params, state) == {params, state}
     end
@@ -219,9 +248,9 @@ defmodule Etop.MonitorTest do
   end
 
   defp pid(list), do: :erlang.list_to_pid(list)
-  defp pid1, do: pid('<0.10.0>')
-  defp pid2, do: pid('<0.11.0>')
-  defp pid3, do: pid('<0.13.0>')
+  defp pid1, do: pid(~c"<0.10.0>")
+  defp pid2, do: pid(~c"<0.11.0>")
+  defp pid3, do: pid(~c"<0.13.0>")
 
   defp stats1,
     do: %{
