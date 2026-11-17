@@ -22,12 +22,12 @@ defmodule Etop.Reader do
   Get the number of CPU Cores.
   """
   def core_count do
-    with topology <- :erlang.system_info(:cpu_topology),
-         processors when is_list(processors) <- topology[:processor] do
-      {:ok, length(processors)}
-    else
-      _ -> :error
-    end
+    cores =
+      [:logical_processors_available, :logical_processors, :schedulers_online]
+      |> Enum.map(&:erlang.system_info/1)
+      |> Enum.find(&(is_integer(&1) and &1 > 0))
+
+    if cores, do: {:ok, cores}, else: :error
   end
 
   @doc """
@@ -68,15 +68,6 @@ defmodule Etop.Reader do
   def remote_cpu_info(%{node: node}) when is_atom(node) do
     pid = self()
 
-    core_count = fn ->
-      with topology <- :erlang.system_info(:cpu_topology),
-           processors when is_list(processors) <- topology[:processor] do
-        {:ok, length(processors)}
-      else
-        _ -> :error
-      end
-    end
-
     os_pid = fn -> List.to_integer(:os.getpid()) end
 
     Node.spawn_link(node, fn ->
@@ -86,7 +77,7 @@ defmodule Etop.Reader do
         pid,
         {:cpu_info_result,
          %{
-           cores: core_count.(),
+           cores: core_count(),
            os_pid: os_pid,
            util: {File.read("/proc/stat"), File.read("/proc/#{os_pid}/stat")}
          }}
@@ -132,7 +123,7 @@ defmodule Etop.Reader do
            nprocs: :process_count |> :erlang.system_info() |> to_string(),
            memory: Enum.into(:erlang.memory(), %{}),
            runq: :erlang.statistics(:run_queue),
-           util: {File.read("/proc/stat"), File.read("/proc/#{pid}/stat")}
+           util: read_stats(List.to_integer(:os.getpid()))
          }}
       )
     end)

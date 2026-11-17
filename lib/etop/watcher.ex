@@ -177,7 +177,7 @@ defmodule Etop.Watcher do
       @spec init(keyword()) :: {:ok, map()}
       def init(opts) do
         {etop_opts, opts} = Keyword.pop(opts, :etop_opts, [])
-        unless etop().alive?(), do: etop().start(etop_opts)
+        if !etop().alive?(), do: etop().start(etop_opts)
         send(self(), :initialize)
         {:ok, initial_state(opts)}
       end
@@ -315,9 +315,7 @@ defmodule Etop.Watcher do
 
         notify(
           state,
-          "Killing process with high msg_q length: #{inspect(value)}, pid: #{inspect(pid)}, info: #{
-            inspect(info)
-          }"
+          "Killing process with high msg_q length: #{inspect(value)}, pid: #{inspect(pid)}, info: #{inspect(info)}"
         )
 
         Process.exit(pid, :kill)
@@ -378,14 +376,14 @@ defmodule Etop.Watcher do
       def add_monitors(state) do
         monitors = etop().monitors()
 
-        unless Enum.find(monitors, find_monitor(:summary, [:load, :total], 0.0)) do
+        if !Enum.find(monitors, find_monitor(:summary, [:load, :total], 0.0)) do
           add_reporting_monitor(state)
         end
 
-        unless Enum.find(
-                 monitors,
-                 find_monitor(:process, :message_queue_len, state.msg_q_notify_lower_limit)
-               ) do
+        if !Enum.find(
+             monitors,
+             find_monitor(:process, :message_queue_len, state.msg_q_notify_lower_limit)
+           ) do
           add_message_queue_monitor(state)
         end
 
@@ -499,7 +497,8 @@ defmodule Etop.Watcher do
         level =
           case state[:notify_log] do
             true -> :info
-            level when level in ~w(error warn info debug)a -> level
+            :warn -> :warning
+            level when level in ~w(error warning info debug)a -> level
             _ -> nil
           end
 

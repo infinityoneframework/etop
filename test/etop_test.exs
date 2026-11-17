@@ -280,7 +280,8 @@ defmodule EtopTest do
 
       assert capture_log(fn ->
                Callbacks.add_callback()
-               Process.sleep(150)
+               :sys.get_state(Callbacks)
+               Etop.Fixtures.collect_cpu_samples()
              end) =~ "match 1"
 
       assert Etop.status().reporting
@@ -299,7 +300,7 @@ defmodule EtopTest do
             msg_q: 0,
             name: ":erlang.apply/2",
             percent: 29.28,
-            pid: '<0.9.0>',
+            pid: ~c"<0.9.0>",
             reds_diff: 921_464,
             reductions: 921_464,
             state: :waiting
@@ -310,7 +311,7 @@ defmodule EtopTest do
             msg_q: 0,
             name: "IEx.Evaluator.init/4",
             percent: 27.83,
-            pid: '<0.226.0>',
+            pid: ~c"<0.226.0>",
             reds_diff: 875_941,
             reductions: 875_941,
             state: :waiting
@@ -321,7 +322,7 @@ defmodule EtopTest do
             msg_q: 10,
             name: ":erlang.apply/2",
             percent: 7.69,
-            pid: '<0.49.0>',
+            pid: ~c"<0.49.0>",
             reds_diff: 241_976,
             reductions: 241_976,
             state: :waiting
@@ -332,7 +333,7 @@ defmodule EtopTest do
             msg_q: 0,
             name: ":group.server/3",
             percent: 6.56,
-            pid: '<0.64.0>',
+            pid: ~c"<0.64.0>",
             reds_diff: 206_407,
             reductions: 206_407,
             state: :waiting
@@ -343,7 +344,7 @@ defmodule EtopTest do
             msg_q: 5,
             name: ":user_drv.server/2",
             percent: 5.46,
-            pid: '<0.62.0>',
+            pid: ~c"<0.62.0>",
             reds_diff: 172_007,
             reductions: 172_007,
             state: :waiting
@@ -354,7 +355,7 @@ defmodule EtopTest do
             msg_q: 0,
             name: ":erts_code_purger.start/0",
             percent: 5.22,
-            pid: '<0.1.0>',
+            pid: ~c"<0.1.0>",
             reds_diff: 164_253,
             reductions: 164_253,
             state: :waiting
@@ -365,7 +366,7 @@ defmodule EtopTest do
             msg_q: 0,
             name: ":erts_literal_area_collector.start/",
             percent: 5.01,
-            pid: '<0.2.0>',
+            pid: ~c"<0.2.0>",
             reds_diff: 157_751,
             reductions: 157_751,
             state: :waiting
@@ -376,7 +377,7 @@ defmodule EtopTest do
             msg_q: 0,
             name: ":application_controller.start/1",
             percent: 4.89,
-            pid: '<0.43.0>',
+            pid: ~c"<0.43.0>",
             reds_diff: 153_876,
             reductions: 153_876,
             state: :waiting
@@ -387,7 +388,7 @@ defmodule EtopTest do
             msg_q: 4,
             name: ":file_server.init/1",
             percent: 3.59,
-            pid: '<0.57.0>',
+            pid: ~c"<0.57.0>",
             reds_diff: 112_924,
             reductions: 112_924,
             state: :waiting
@@ -398,7 +399,7 @@ defmodule EtopTest do
             msg_q: 0,
             name: ":disk_log.init/2",
             percent: 1.22,
-            pid: '<0.79.0>',
+            pid: ~c"<0.79.0>",
             reds_diff: 38389,
             reductions: 38389,
             state: :waiting

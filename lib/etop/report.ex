@@ -33,7 +33,6 @@ defmodule Etop.Report do
   alias Etop.{Utils, Chart}
 
   require Logger
-  require IEx
 
   @cols [15, 35, 8, 13, 9, 4, 10, 30]
   @header [
@@ -68,7 +67,7 @@ defmodule Etop.Report do
     msg_q: 0,
     name: ":disk_log.init/2",
     percent: 1.22,
-    pid: '<0.79.0>',
+    pid: ~c"<0.79.0>",
     reds_diff: 38389,
     reductions: 38389,
     state: :waiting
@@ -294,7 +293,7 @@ defmodule Etop.Report do
     if !opts[:sort] || !!@sort_field_mapper[opts[:sort]] do
       Enum.each(entries, &print(&1, file, opts))
     else
-      Logger.warn("invalid sort options")
+      Logger.warning("invalid sort options")
       {:error, :invalid_sort_option}
     end
   end
@@ -324,7 +323,7 @@ defmodule Etop.Report do
     exists? = File.exists?(path)
 
     File.open(path, [:append], fn fp ->
-      unless exists?, do: IO.puts(fp, @exs_template)
+      if !exists?, do: IO.puts(fp, @exs_template)
 
       IO.puts(fp, [
         "A.add(",
@@ -452,8 +451,8 @@ defmodule Etop.Report do
         )
       rescue
         e ->
-          Logger.warn(inspect(e))
-          Logger.warn("Bad result: " <> inspect(p))
+          Logger.warning(inspect(e))
+          Logger.warning("Bad result: " <> inspect(p))
           report
       end
     end)
@@ -530,7 +529,7 @@ defmodule Etop.Report do
   defp write_report(report, path) when is_binary(path) do
     case File.write(path, report, [:append]) do
       :ok -> :ok
-      error -> Logger.warn("Could not write to #{path}, error: #{inspect(error)}")
+      error -> Logger.warning("Could not write to #{path}, error: #{inspect(error)}")
     end
   end
 
